@@ -1,0 +1,4483 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>NexKirana</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      background: #121212;
+      color: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 2.2em;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    #search-input {
+      width: 100%;
+      font-size: 16px;
+      padding: 12px 16px;
+      margin-bottom: 22px;
+      margin-top: 5px;
+      border-radius: 8px;
+      background-color: #1a1a1a;
+      color: #fff;
+      border: 1px solid #333;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+    #search-input:focus {
+      outline: none;
+      border-color: #26F7FD;
+      box-shadow: 0 0 0 2px rgba(38, 247, 253, 0.2);
+    }
+    .category-filter {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 0 10px;
+    }
+    .category-btn {
+      background: #333;
+      color: white;
+      padding: 14px 22px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .category-btn:hover {
+      background: #555;
+    }
+    .category-btn.active {
+      background: #26F7FD;
+      color: #222;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(38, 247, 253, 0.3);
+      transform: translateY(-1px);
+    }
+    .product {
+      background: #1e1e1e;
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      border: 1px solid #2a2a2a;
+    }
+    .product-description {
+      color: #ccc;
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 10px 0;
+      padding: 12px;
+      background: #232323;
+      border-radius: 8px;
+      border-left: 4px solid #26F7FD;
+      font-weight: 400;
+    }
+    .product button {
+      margin: 6px 6px 0 0;
+      font-weight: 600;
+      font-size: 16px;
+      min-width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    button {
+      background-color: #333;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    button:hover {
+      background-color: #555;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    input[type="text"]:not(#search-input), input[type="address"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      background-color: #1c1c1c;
+      color: white;
+      border: 1px solid #333;
+    }
+    #cart-summary {
+      background-color: #1c1c1c;
+      padding: 12px;
+      border-radius: 8px;
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      min-width: 200px;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    #cart-summary .cart-actions {
+      margin-top: 12px;
+      text-align: center;
+    }
+    #checkout-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background: #26F7FD;
+      color: #222;
+      border: none;
+      border-radius: 6px;
+      margin-top: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #checkout-btn:disabled {
+      background: #888;
+      color: #fff;
+      cursor: not-allowed;
+    }
+    /* Modal styles */
+    #checkout-modal {
+      display: none;
+      position: fixed;
+      z-index: 200;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    #checkout-modal .modal-content {
+      background: #232323;
+      padding: 32px 24px 24px 24px;
+      border-radius: 10px;
+      min-width: 320px;
+      max-width: 90vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      color: #fff;
+      position: relative;
+    }
+    #checkout-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    #place-order {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 10px;
+      background: #28a745;
+      border: none;
+      border-radius: 6px;
+      color: white;
+    }
+    /* Orders Modal */
+    #orders-modal {
+      display: none;
+      position: fixed;
+      z-index: 210;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    #orders-modal .modal-content {
+      background: #232323;
+      padding: 32px 24px 24px 24px;
+      border-radius: 10px;
+      min-width: 340px;
+      max-width: 95vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      color: #fff;
+      position: relative;
+    }
+    #orders-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .order-card {
+      background: #181818;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .order-card strong {
+      color: #26F7FD;
+    }
+    /* Monochrome login/register */
+    #auth-container {
+      background: #181818;
+      max-width: 350px;
+      margin: 40px auto 0 auto;
+      padding: 32px 28px 24px 28px;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - 40px);
+      max-width: 350px;
+    }
+    #auth-container h2 {
+      color: #fff;
+      text-align: center;
+      margin-bottom: 18px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    #auth-container input[type="email"],
+    #auth-container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 6px;
+      background: #232323;
+      color: #fff;
+      border: 1px solid #444;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    #auth-container input[type="email"]:focus,
+    #auth-container input[type="password"]:focus {
+      border: 1.5px solid #888;
+    }
+    #auth-container button {
+      width: 100%;
+      padding: 12px;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    #auth-container button:hover {
+      background: #444;
+    }
+    #auth-container p {
+      color: #bbb;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    #auth-container a {
+      color: #fff;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    #auth-error {
+      color: #ff4444;
+      background: #232323;
+      border-radius: 5px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 14px;
+      display: none;
+    }
+    /* Forgot password modal with animation */
+    #forgot-modal {
+      display: none;
+      position: fixed;
+      z-index: 600;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.45);
+      justify-content: center;
+      align-items: center;
+    }
+    #forgot-modal.active {
+      display: flex;
+    }
+    #forgot-modal .modal-content {
+      background: #232323;
+      padding: 32px 24px 24px 24px;
+      border-radius: 14px;
+      min-width: 320px;
+      max-width: 90vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      color: #fff;
+      position: relative;
+      text-align: left;
+    }
+    #forgot-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    #forgot-modal .close-btn:hover {
+      opacity: 1;
+    }
+    #forgot-modal input[type="email"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      background: #232323;
+      color: #fff;
+      border: 1px solid #444;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    #forgot-modal button {
+      width: 100%;
+      padding: 12px;
+      background: #222;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    #forgot-modal button:hover {
+      background: #444;
+    }
+    #forgot-message {
+      color: #26F7FD;
+      margin-bottom: 10px;
+      font-size: 15px;
+      display: none;
+      transition: color 0.2s;
+      text-align: center;
+    }
+    /* Dynamic product grid */
+    #products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+      padding: 0 10px;
+    }
+    .product {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .grid-actions {
+      background: #181818;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+      padding: 18px 10px;
+      gap: 12px;
+    }
+    .grid-actions button {
+      width: 100%;
+      margin-bottom: 8px;
+      font-size: 15px;
+      padding: 10px 0;
+    }
+    .grid-actions #cart-summary {
+      margin-bottom: 18px;
+    }
+    .grid-actions .action-divider {
+      width: 80%;
+      height: 1px;
+      background: #333;
+      margin: 10px auto 18px auto;
+      border: none;
+      opacity: 0.7;
+    }
+    /* Floating View Cart button */
+    #floating-view-cart {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 400;
+      background: #232323;
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 14px 28px;
+      font-size: 17px;
+      font-weight: 600;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    #floating-view-cart:hover {
+      background: #444;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+    }
+    /* Mobile-First Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 6px;
+        font-size: 16px;
+        line-height: 1.4;
+      }
+      
+      h1 {
+        font-size: 1.6em;
+        margin: 12px 0 8px 0;
+        letter-spacing: -0.1px;
+        text-align: center;
+      }
+      
+      #search-input {
+        font-size: 16px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        margin-top: 4px;
+        border: 2px solid #333;
+      }
+      
+      #search-input:focus {
+        border-color: #26F7FD;
+        box-shadow: 0 0 0 3px rgba(38, 247, 253, 0.15);
+      }
+      
+      .category-filter {
+        gap: 6px;
+        margin-bottom: 12px;
+        padding: 0 2px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-bottom: 4px;
+      }
+      
+      .category-filter::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .category-btn {
+        font-size: 15px;
+        padding: 12px 16px;
+        border-radius: 18px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        min-width: auto;
+        font-weight: 500;
+      }
+      
+      .category-btn.active {
+        background: #26F7FD;
+        color: #222;
+        font-weight: 600;
+        transform: scale(1.05);
+      }
+      
+      #products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 8px;
+        margin-top: 8px;
+        margin-bottom: 90px; /* Space for floating cart button */
+        padding: 0 5px;
+      }
+      
+      .product {
+        padding: 10px;
+        min-height: 130px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      
+      .product strong {
+        font-size: 14px;
+        line-height: 1.2;
+        display: block;
+        margin-bottom: 3px;
+        font-weight: 600;
+      }
+      
+      .product-description {
+        font-size: 11px;
+        padding: 6px;
+        margin: 4px 0;
+        line-height: 1.2;
+        border-left: 3px solid #26F7FD;
+      }
+      
+      .product button {
+        font-size: 16px;
+        min-width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        margin: 2px 2px 0 0;
+        font-weight: 700;
+      }
+      
+      .grid-actions {
+        min-height: 110px;
+        padding: 10px 6px;
+        gap: 6px;
+        border-radius: 10px;
+      }
+      
+      .grid-actions button {
+        font-size: 12px;
+        padding: 8px 0;
+        margin-bottom: 3px;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+      
+      #floating-view-cart {
+        right: 8px;
+        bottom: 8px;
+        padding: 10px 16px;
+        font-size: 12px;
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        z-index: 1000;
+        font-weight: 600;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+      
+      /* Modal improvements for mobile */
+      .modal-content {
+        padding: 20px 16px;
+        min-width: 92vw;
+        max-width: 96vw;
+        border-radius: 12px;
+        margin: 16px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      
+      /* Payment method modal mobile optimization */
+      #payment-method-modal .modal-content {
+        background: #1e1e1e !important;
+        color: #f5f5f5 !important;
+        padding: 24px 20px;
+        border-radius: 16px;
+        border: 1px solid #333;
+      }
+      
+      #payment-method-modal button {
+        font-size: 16px !important;
+        padding: 14px 0 !important;
+        border-radius: 10px !important;
+        margin-bottom: 10px !important;
+        font-weight: 600 !important;
+      }
+      
+      /* Cart modal mobile optimization */
+      #cart-modal .modal-content {
+        max-height: 88vh;
+        overflow-y: auto;
+        padding: 20px 16px;
+      }
+      
+      /* Order cards mobile optimization */
+      .order-card {
+        padding: 12px;
+        margin-bottom: 12px;
+        font-size: 14px;
+        border-radius: 10px;
+        line-height: 1.3;
+      }
+      
+      /* Auth container mobile optimization */
+      #auth-container {
+        max-width: 96vw;
+        padding: 24px 20px;
+        margin: 0 auto;
+        border-radius: 12px;
+        width: calc(100% - 32px);
+      }
+      
+      #auth-container h2 {
+        font-size: 1.4em;
+        margin-bottom: 16px;
+      }
+      
+      #auth-container input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        border: 1px solid #444;
+      }
+      
+      #auth-container button {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+      
+      #auth-container p {
+        font-size: 14px;
+        margin-top: 8px;
+      }
+      
+      /* Profile modal mobile optimization */
+      #profile-page {
+        padding: 16px;
+      }
+      
+      .profile-form {
+        padding: 20px 16px;
+      }
+      
+      .profile-form input,
+      .profile-form select {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+      
+      .profile-form button {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+      
+      /* Checkout modal mobile optimization */
+      #checkout-modal .modal-content {
+        padding: 20px 16px;
+      }
+      
+      #checkout-modal h3 {
+        font-size: 1.3em;
+        margin-bottom: 16px;
+      }
+      
+      #checkout-modal input {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+      }
+      
+      #place-order {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+      
+      /* Orders modal mobile optimization */
+      #orders-modal .modal-content {
+        padding: 20px 16px;
+        max-height: 88vh;
+      }
+      
+      #orders-modal h3 {
+        font-size: 1.3em;
+        margin-bottom: 16px;
+      }
+      
+      /* Forgot password modal mobile optimization */
+      #forgot-modal .modal-content {
+        padding: 20px 16px;
+      }
+      
+      #forgot-modal h3 {
+        font-size: 1.3em;
+        margin-bottom: 16px;
+      }
+      
+      #forgot-modal input {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+      
+      #forgot-modal button {
+        font-size: 16px;
+        padding: 14px;
+        border-radius: 8px;
+        font-weight: 600;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        padding: 4px;
+        font-size: 15px;
+      }
+      
+      h1 {
+        font-size: 1.4em;
+        margin: 10px 0 6px 0;
+      }
+      
+      #search-input {
+        font-size: 16px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+      }
+      
+      .category-filter {
+        gap: 4px;
+        margin-bottom: 10px;
+        padding-bottom: 2px;
+      }
+      
+      .category-btn {
+        font-size: 14px;
+        padding: 10px 14px;
+        border-radius: 16px;
+      }
+      
+      #products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 6px;
+        margin-top: 6px;
+        margin-bottom: 85px;
+        padding: 0 4px;
+      }
+      
+      .product {
+        padding: 8px;
+        min-height: 110px;
+        border-radius: 8px;
+      }
+      
+      .product strong {
+        font-size: 13px;
+        margin-bottom: 2px;
+      }
+      
+      .product-description {
+        font-size: 10px;
+        padding: 4px;
+        margin: 3px 0;
+        border-left: 2px solid #26F7FD;
+      }
+      
+      .product button {
+        font-size: 14px;
+        min-width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        margin: 1px 1px 0 0;
+      }
+      
+      .grid-actions {
+        min-height: 100px;
+        padding: 8px 4px;
+        gap: 4px;
+        border-radius: 8px;
+      }
+      
+      .grid-actions button {
+        font-size: 11px;
+        padding: 6px 0;
+        margin-bottom: 2px;
+        border-radius: 5px;
+      }
+      
+      #floating-view-cart {
+        right: 6px;
+        bottom: 6px;
+        padding: 0;
+        font-size: 11px;
+        border-radius: 18px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .modal-content {
+        padding: 16px 12px;
+        margin: 12px;
+        border-radius: 10px;
+        min-width: 94vw;
+        max-width: 98vw;
+      }
+      
+      .modal-content h3 {
+        font-size: 1.2em;
+        margin-bottom: 12px;
+      }
+      
+      .modal-content input {
+        font-size: 16px;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+      
+      .modal-content button {
+        font-size: 15px;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+      
+      #auth-container {
+        padding: 20px 16px;
+        margin: 0 auto;
+        border-radius: 10px;
+        width: calc(100% - 24px);
+      }
+      
+      #auth-container h2 {
+        font-size: 1.3em;
+        margin-bottom: 12px;
+      }
+      
+      #auth-container input {
+        font-size: 16px;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+      }
+      
+      #auth-container button {
+        font-size: 15px;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+      
+      #auth-container p {
+        font-size: 13px;
+        margin-top: 6px;
+      }
+    }
+    
+    @media (max-width: 360px) {
+      body {
+        padding: 2px;
+        font-size: 14px;
+      }
+      
+      h1 {
+        font-size: 1.3em;
+        margin: 8px 0 4px 0;
+      }
+      
+      #search-input {
+        font-size: 16px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+      }
+      
+      .category-filter {
+        gap: 3px;
+        margin-bottom: 8px;
+      }
+      
+      .category-btn {
+        font-size: 11px;
+        padding: 5px 8px;
+        border-radius: 14px;
+      }
+      
+      #products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        margin-top: 4px;
+        margin-bottom: 80px;
+        padding: 0 2px;
+      }
+      
+      .product {
+        min-height: 140px;
+        padding: 12px;
+        border-radius: 8px;
+      }
+      
+      .product strong {
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      
+      .product-description {
+        font-size: 11px;
+        padding: 6px;
+        margin: 4px 0;
+        border-left: 2px solid #26F7FD;
+      }
+      
+      .product button {
+        font-size: 15px;
+        min-width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        margin: 2px 2px 0 0;
+      }
+      
+      .grid-actions {
+        min-height: 120px;
+        padding: 12px 8px;
+        gap: 6px;
+        border-radius: 8px;
+      }
+      
+      .grid-actions button {
+        font-size: 13px;
+        padding: 8px 0;
+        margin-bottom: 3px;
+        border-radius: 6px;
+      }
+      
+      #floating-view-cart {
+        right: 4px;
+        bottom: 4px;
+        padding: 0;
+        font-size: 10px;
+        border-radius: 16px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .modal-content {
+        padding: 12px 8px;
+        margin: 8px;
+        border-radius: 8px;
+        min-width: 96vw;
+        max-width: 99vw;
+      }
+      
+      .modal-content h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+      }
+      
+      .modal-content input {
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 8px;
+      }
+      
+      .modal-content button {
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: 600;
+      }
+      
+      #auth-container {
+        padding: 16px 12px;
+        margin: 0 auto;
+        border-radius: 8px;
+        width: calc(100% - 16px);
+      }
+      
+      #auth-container h2 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+      }
+      
+      #auth-container input {
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      }
+      
+      #auth-container button {
+        font-size: 14px;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 6px;
+      }
+      
+      #auth-container p {
+        font-size: 12px;
+        margin-top: 4px;
+      }
+    }
+    /* Cart Modal */
+    #cart-modal {
+      display: none;
+      position: fixed;
+      z-index: 500;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.45);
+      justify-content: center;
+      align-items: center;
+    }
+    #cart-modal .modal-content {
+      background: #232323;
+      padding: 32px 24px 24px 24px;
+      border-radius: 14px;
+      min-width: 320px;
+      max-width: 90vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      color: #fff;
+      position: relative;
+      text-align: left;
+    }
+    #cart-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    #cart-modal .close-btn:hover {
+      opacity: 1;
+    }
+    #cart-modal h3 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    #cart-modal .cart-items {
+      margin-bottom: 18px;
+    }
+    #cart-modal .cart-total {
+      font-weight: bold;
+      margin-bottom: 18px;
+      text-align: right;
+    }
+    #cart-modal .cart-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    #cart-modal .cart-actions button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      background: #28a745;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #cart-modal .cart-actions button:disabled {
+      background: #888;
+      cursor: not-allowed;
+    }
+    #cart-modal .address-section {
+      margin-top: 18px;
+      background: #181818;
+      padding: 16px 12px;
+      border-radius: 8px;
+    }
+    #cart-modal .address-section input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      background: #232323;
+      color: #fff;
+      border: 1px solid #333;
+    }
+    #cart-modal .address-section label {
+      color: #bbb;
+      font-size: 14px;
+      margin-bottom: 4px;
+      display: block;
+    }
+    #cart-modal .empty-cart {
+      color: #bbb;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    /* Add Address Modal */
+    #address-modal {
+      display: none;
+      position: fixed;
+      z-index: 700;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.45);
+      justify-content: center;
+      align-items: center;
+    }
+    #address-modal .modal-content {
+      background: #232323;
+      padding: 32px 24px 24px 24px;
+      border-radius: 14px;
+      min-width: 320px;
+      max-width: 90vw;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      color: #fff;
+      position: relative;
+      text-align: left;
+    }
+    #address-modal .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    #address-modal .close-btn:hover {
+      opacity: 1;
+    }
+    #address-modal input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      background: #232323;
+      color: #fff;
+      border: 1px solid #444;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    #address-modal button {
+      width: 100%;
+      padding: 12px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    #address-modal button:hover {
+      background: #444;
+    }
+    #address-modal .address-success {
+      color: #28a745;
+      margin-bottom: 10px;
+      text-align: center;
+      display: none;
+    }
+    #address-modal .address-error {
+      color: #ff4444;
+      margin-bottom: 10px;
+      text-align: center;
+      display: none;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .product:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    /* Navigation Bar Styles */
+    #nav-bar {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+      border-bottom: 2px solid #26F7FD;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 70px;
+    }
+
+    .nav-container .desktop-nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-container .hamburger-menu {
+      order: 3;
+    }
+
+    .nav-brand {
+      font-size: 1.8em;
+      font-weight: 800;
+      color: #26F7FD;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: linear-gradient(135deg, #333 0%, #444 100%);
+      color: #fff;
+      border: 2px solid transparent;
+      padding: 16px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-btn:hover::before {
+      left: 100%;
+    }
+
+    .nav-btn:hover {
+      background: linear-gradient(135deg, #555 0%, #666 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+      border-color: #26F7FD;
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, #26F7FD 0%, #4DF9FF 100%);
+      color: #222;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(38, 247, 253, 0.4);
+      border-color: #4DF9FF;
+    }
+
+    /* Page Styles */
+    .page-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px 0;
+    }
+
+    .page-header h2 {
+      margin: 0;
+      font-size: 1.8em;
+      font-weight: 600;
+      color: #f5f5f5;
+    }
+
+    .search-section {
+      margin-bottom: 24px;
+    }
+
+    /* Cart Page Styles */
+    #cart-page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    #cart-items-container {
+      margin-bottom: 24px;
+    }
+
+    .cart-item {
+      background: #1e1e1e;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #2a2a2a;
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-name {
+      font-weight: 600;
+      color: #f5f5f5;
+      margin-bottom: 4px;
+    }
+
+    .cart-item-price {
+      color: #26F7FD;
+      font-weight: 500;
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cart-item-qty {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .cart-item-qty:hover {
+      background: #555;
+    }
+
+    .cart-total {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      text-align: center;
+      border: 1px solid #2a2a2a;
+    }
+
+    .cart-total h3 {
+      margin: 0 0 12px 0;
+      color: #f5f5f5;
+    }
+
+    .cart-total .total-amount {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #26F7FD;
+    }
+
+    .cart-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cart-actions button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cart-actions button:first-child {
+      background: #28a745;
+      color: #fff;
+      border: none;
+    }
+
+    .cart-actions button:first-child:hover {
+      background: #218838;
+      transform: translateY(-1px);
+    }
+
+    .cart-actions button:last-child {
+      background: #333;
+      color: #fff;
+      border: none;
+    }
+
+    .cart-actions button:last-child:hover {
+      background: #555;
+      transform: translateY(-1px);
+    }
+
+    /* Orders Page Styles */
+    #orders-page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    #orders-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Profile Page Styles */
+    #profile-page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    #current-profile-display {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .token-display-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      text-align: center;
+      color: white;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .token-display-section h3 {
+      margin: 0 0 15px 0;
+      font-size: 1.3em;
+      color: #f5f5f5;
+    }
+
+    .token-info {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .token-amount {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #f5f5f5;
+    }
+
+    .token-value {
+      font-size: 1.1em;
+      color: #e0e0e0;
+    }
+
+    .profile-form {
+      background: #1e1e1e;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .profile-form h3 {
+      margin: 0 0 20px 0;
+      color: #f5f5f5;
+      text-align: center;
+    }
+
+    .profile-form h4 {
+      margin: 20px 0 12px 0;
+      color: #f5f5f5;
+      font-size: 1.1em;
+    }
+
+    .profile-form input,
+    .profile-form select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      background: #232323;
+      color: #fff;
+      border: 1px solid #444;
+      font-size: 16px;
+    }
+
+          .profile-form input:focus,
+      .profile-form select:focus {
+        outline: none;
+        border-color: #26F7FD;
+        box-shadow: 0 0 0 2px rgba(38, 247, 253, 0.2);
+      }
+
+    .profile-form input[readonly] {
+      background: #2a2a2a;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    .profile-form button {
+      width: 100%;
+      padding: 14px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .profile-form button:hover {
+      background: #218838;
+    }
+
+    .address-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+    }
+
+    .profile-success {
+      color: #28a745;
+      text-align: center;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    .profile-error {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+
+
+    /* Store Credits Page Styles */
+    #tokens-page {
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .tokens-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .token-balance-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 30px;
+      border-radius: 20px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      grid-column: 1 / -1;
+    }
+
+    .token-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .token-amount {
+      margin-bottom: 15px;
+    }
+
+    #tokens-page-count {
+      font-size: 64px;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .token-unit {
+      font-size: 24px;
+      opacity: 0.9;
+    }
+
+    .token-value-display {
+      font-size: 20px;
+      background: rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 25px;
+      display: inline-block;
+    }
+
+    .token-rules-card,
+    .token-history-card,
+    .token-info-card {
+      background: #1e1e1e;
+      padding: 25px;
+      border-radius: 15px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .token-rules-card h3,
+    .token-history-card h3,
+    .token-info-card h3 {
+      margin: 0 0 20px 0;
+      color: #f5f5f5;
+      text-align: center;
+      font-size: 20px;
+    }
+
+    .rule-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin: 10px 0;
+      background: #2a2a2a;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+
+    .rule-amount {
+      font-weight: bold;
+      color: #f5f5f5;
+    }
+
+    .rule-tokens {
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .rule-value {
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    .no-history {
+      text-align: center;
+      color: #888;
+      font-style: italic;
+      padding: 20px;
+    }
+
+    .token-info-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .token-info-card li {
+      margin: 10px 0;
+      color: #ccc;
+      line-height: 1.5;
+    }
+
+    /* Mobile Responsive for Navigation */
+    @media (max-width: 768px) {
+      .nav-container {
+        padding: 0 16px;
+        min-height: 65px;
+      }
+
+      .nav-brand {
+        font-size: 1.6em;
+        font-weight: 800;
+      }
+
+      .nav-menu {
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .nav-btn {
+        padding: 14px 18px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 10px;
+        min-width: 80px;
+        text-align: center;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+
+      .page-header h2 {
+        font-size: 1.5em;
+      }
+
+      .cart-item {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+      }
+
+      .cart-actions {
+        flex-direction: column;
+      }
+
+      .cart-actions button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-container {
+        padding: 0 12px;
+        min-height: 60px;
+      }
+
+      .nav-brand {
+        font-size: 1.4em;
+        font-weight: 800;
+      }
+
+      .nav-menu {
+        gap: 6px;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .nav-btn {
+        padding: 12px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 8px;
+        min-width: 70px;
+        flex: 1;
+        margin: 0 2px;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      }
+
+      .page-header h2 {
+        font-size: 1.3em;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .nav-container {
+        padding: 0 8px;
+        min-height: 55px;
+      }
+
+      .nav-brand {
+        font-size: 1.2em;
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+    /* Desktop navigation styles */
+    @media (min-width: 769px) {
+      .desktop-nav {
+        display: flex;
+      }
+      
+
+    }
+
+    @media (max-width: 360px) {
+      .nav-container {
+        padding: 0 8px;
+        min-height: 55px;
+      }
+
+      .nav-brand {
+        font-size: 1.2em;
+        font-weight: 800;
+      }
+
+      .nav-menu {
+        gap: 4px;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .nav-btn {
+        padding: 10px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 6px;
+        min-width: 60px;
+        flex: 1;
+        margin: 0 1px;
+      }
+
+      .nav-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      }
+    }
+    
+    /* Price Container Styles */
+    .price-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+    
+    .selling-price {
+      color: #26F7FD;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+
+  </style>
+</head>
+<body>
+
+  <h1>NexKirana</h1>
+
+  <!-- Auth UI -->
+  <div id="auth-container">
+    <div id="login-form" style="display:none;">
+      <h2>Login</h2>
+      <div id="auth-error"></div>
+      <input type="email" id="login-email" placeholder="Email" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+      <p style="margin-top:0; margin-bottom:8px;"><a href="#" onclick="openForgotModal()">Forgot Password?</a></p>
+      <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+    </div>
+    <div id="register-form" style="display:none;">
+      <h2>Register</h2>
+      <div id="auth-error"></div>
+      <input type="email" id="register-email" placeholder="Email" />
+      <input type="password" id="register-password" placeholder="Password" />
+      <button onclick="register()">Register</button>
+      <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav id="nav-bar" style="display:none;">
+    <div class="nav-container">
+      <div class="nav-brand">NexKirana</div>
+      
+
+      
+      <!-- Desktop Navigation -->
+      <div class="nav-menu desktop-nav">
+        <button class="nav-btn active" onclick="showPage('shop')">Shop</button>
+        <button class="nav-btn" onclick="showPage('cart')">Cart</button>
+        <button class="nav-btn" onclick="showPage('orders')">Orders</button>
+        <button class="nav-btn" onclick="showPage('tokens')">Store Credits</button>
+        <button class="nav-btn" onclick="showPage('profile')">Profile</button>
+        <button class="nav-btn" onclick="confirmLogout()">Logout</button>
+      </div>
+      
+
+
+    </div>
+  </nav>
+
+  <!-- Shop UI (hidden if not logged in) -->
+  <div id="shop-ui" style="display:none; position:relative; min-height: 600px;">
+    <div class="search-section">
+      <input type="text" id="search-input" placeholder="Search products…">
+      <div class="category-filter">
+        <button class="category-btn active" data-category="all">All Categories</button>
+        <button class="category-btn" data-category="Produce">Produce</button>
+        <button class="category-btn" data-category="Groceries">Groceries</button>
+        <button class="category-btn" data-category="Dairy">Dairy</button>
+        <button class="category-btn" data-category="Beverages">Beverages</button>
+        <button class="category-btn" data-category="Spices">Spices</button>
+        <button class="category-btn" data-category="Daily Needs">Daily Needs</button>
+        <button class="category-btn" data-category="Snacks">Snacks</button>
+      </div>
+    </div>
+    <div id="products-grid"></div>
+  </div>
+
+  <!-- Cart Page -->
+  <div id="cart-page" style="display:none;">
+    <div class="page-header">
+      <h2>Your Cart</h2>
+    </div>
+    <div id="cart-items-container"></div>
+    <div class="cart-actions">
+      <button id="checkout-btn" onclick="openPaymentMethodModal()" disabled>Proceed to Checkout</button>
+      <button onclick="showPage('shop')">🛍️ Continue Shopping</button>
+    </div>
+  </div>
+
+  <!-- Orders Page -->
+  <div id="orders-page" style="display:none;">
+    <div class="page-header">
+      <h2>Your Orders</h2>
+    </div>
+    <div id="orders-container"></div>
+  </div>
+
+  <!-- Profile Page -->
+  <div id="profile-page" style="display:none;">
+    <div class="page-header">
+      <h2>My Profile</h2>
+    </div>
+    <div id="current-profile-display"></div>
+    
+    <!-- Store Credits Display Section -->
+    <div class="token-display-section">
+      <h3>🎯 My Store Credits</h3>
+      <div class="token-info">
+        <div class="token-amount">
+          <span id="profile-token-count">0</span> store credits
+        </div>
+        <div class="token-value">
+          Value: ₹<span id="profile-token-value">0.00</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="profile-form">
+      <h3>Update Profile</h3>
+      <input type="text" id="profile-name" placeholder="Full Name" />
+      <input type="email" id="profile-email" placeholder="Email" readonly />
+      <input type="date" id="profile-birthdate" placeholder="Birth Date" />
+      <select id="profile-gender">
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+        <option value="prefer-not-to-say">Prefer not to say</option>
+      </select>
+      <div class="address-section">
+        <h4>Address Details</h4>
+        <input type="text" id="profile-address-street" placeholder="Street" />
+        <input type="text" id="profile-address-apartment" placeholder="Apartment, suite, etc." />
+        <input type="text" id="profile-address-city" placeholder="City" />
+        <input type="text" id="profile-address-state" placeholder="State" />
+        <input type="text" id="profile-address-pincode" placeholder="Pincode" />
+        <input type="text" id="profile-address-country" placeholder="Country" />
+      </div>
+      <button onclick="saveProfile()">💾 Save Profile</button>
+      
+      <!-- Token Validation Section -->
+      <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #333;">
+        <h4 style="margin: 20px 0 12px 0; color: #f5f5f5; font-size: 1.1em;">🎯 Store Credits Management</h4>
+        <button onclick="validateTokenCalculations()" style="width: 100%; padding: 12px; background: #667eea; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 12px; transition: background 0.2s;">
+          🔍 Validate Token Calculations
+        </button>
+        <button onclick="refreshTokenDisplay()" style="width: 100%; padding: 12px; background: #28a745; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+          🔄 Refresh Token Display
+        </button>
+      </div>
+    </div>
+    
+
+  </div>
+
+  <!-- Store Credits Page -->
+  <div id="tokens-page" style="display:none;">
+    <div class="page-header">
+      <h2>🎯 My Store Credits</h2>
+    </div>
+    
+    <div class="tokens-container">
+      <div class="token-balance-card">
+        <div class="token-icon">🎯</div>
+        <div class="token-amount">
+          <span id="tokens-page-count">0</span>
+          <span class="token-unit">store credits</span>
+        </div>
+        <div class="token-value-display">
+          Value: ₹<span id="tokens-page-value">0.00</span>
+        </div>
+      </div>
+      
+      <div class="token-rules-card">
+        <h3>📋 Store Credit Earning Rules</h3>
+        <div class="rule-item">
+          <div class="rule-amount">Order < ₹100</div>
+          <div class="rule-tokens">10 store credits</div>
+          <div class="rule-value">₹5 value</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-amount">Order < ₹300</div>
+          <div class="rule-tokens">25 store credits</div>
+          <div class="rule-value">₹12.5 value</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-amount">Order < ₹500</div>
+          <div class="rule-tokens">50 store credits</div>
+          <div class="rule-value">₹25 value</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-amount">Order ≥ ₹500</div>
+          <div class="rule-tokens">100 store credits</div>
+          <div class="rule-value">₹50 value</div>
+        </div>
+      </div>
+      
+      <div class="token-history-card">
+        <h3>📈 Token History</h3>
+        <div id="token-history-list">
+          <div class="no-history">No token history yet. Place orders to start earning!</div>
+        </div>
+      </div>
+      
+      <div class="token-info-card">
+        <h3>ℹ️ How Store Credits Work</h3>
+        <ul>
+          <li>Earn store credits automatically with every order</li>
+          <li>1 store credit = ₹0.5 in value</li>
+          <li>Store credits are awarded based on order amount</li>
+          <li>Check your profile page for detailed information</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkout-modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeCheckoutModal()">&times;</button>
+  <h3>Customer Details</h3>
+  <input type="text" id="name" placeholder="Your Name" />
+      <input type="text" id="address-street" placeholder="Street" />
+      <input type="text" id="address-apartment" placeholder="Apartment, suite, etc." />
+      <input type="text" id="address-city" placeholder="City" />
+      <input type="text" id="address-state" placeholder="State" />
+      <input type="text" id="address-pincode" placeholder="Pincode" />
+      <input type="text" id="address-country" placeholder="Country" />
+  <button id="place-order" onclick="placeOrder()">Place Order</button>
+    </div>
+  </div>
+
+  <!-- Orders Modal -->
+  <div id="orders-modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeOrdersModal()">&times;</button>
+      <h3>Your Orders</h3>
+      <div id="orders-list">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgot-modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeForgotModal()">&times;</button>
+      <h3>Reset Password</h3>
+      <div id="forgot-message"></div>
+      <input type="email" id="forgot-email" placeholder="Enter your email" />
+      <button onclick="sendResetEmail()">Send Reset Link</button>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cart-modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeCartModal()">&times;</button>
+      <h3>Your Cart</h3>
+      <div id="cart-modal-content"></div>
+      <div class="cart-actions" id="cart-modal-actions"></div>
+      <div class="address-section" id="cart-address-section" style="display:none;">
+        <label for="cart-address-input">Address</label>
+        <input type="text" id="cart-address-input" placeholder="Enter your address" />
+        <button onclick="saveCartAddress()">Add Address</button>
+        <button id="place-order-btn" onclick="placeOrderFromCart()" disabled>Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating View Cart Button -->
+  <button id="floating-view-cart" onclick="showCartSummary()" style="display:none;">🛒</button>
+
+  <!-- Add Address Modal -->
+  <div id="address-modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeAddressModal()">&times;</button>
+      <h3>Add / Update Address</h3>
+      <div class="address-success" id="address-success"></div>
+      <div class="address-error" id="address-error"></div>
+      <input type="text" id="modal-address-street" placeholder="Street" />
+      <input type="text" id="modal-address-apartment" placeholder="Apartment, suite, etc." />
+      <input type="text" id="modal-address-city" placeholder="City" />
+      <input type="text" id="modal-address-state" placeholder="State" />
+      <input type="text" id="modal-address-pincode" placeholder="Pincode" />
+      <input type="text" id="modal-address-country" placeholder="Country" />
+      <button onclick="saveProfileAddress()">Save Address</button>
+    </div>
+  </div>
+
+  <!-- Payment Method Selection Modal -->
+  <div id="payment-method-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);justify-content:center;align-items:center;">
+    <div style="background:#1e1e1e;color:#f5f5f5;padding:36px 32px 32px 32px;border-radius:18px;min-width:320px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,0.35);text-align:center;border:1px solid #333;">
+      <h3 style="margin-bottom:24px;font-size:1.4em;font-weight:700;color:#f5f5f5;">Choose Payment Method</h3>
+      <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:24px;">
+        <button id="token-payment-btn" style="width:100%;padding:16px 0;font-size:1.1em;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+          🎯 Pay with Store Credits
+          <div style="font-size:0.8em;margin-top:4px;opacity:0.9;" id="token-payment-info">
+            Loading store credit balance...
+          </div>
+        </button>
+        <button id="upi-payment-btn" style="width:100%;padding:16px 0;font-size:1.1em;background:#4a90e2;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;transition:background 0.2s;">
+          💳 Pay with UPI
+        </button>
+        <button id="cod-payment-btn" style="width:100%;padding:16px 0;font-size:1.1em;background:#28a745;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;transition:background 0.2s;">
+          💰 Cash on Delivery (COD)
+        </button>
+      </div>
+      <div id="payment-status-msg" style="margin-top:16px;display:none;padding:12px;border-radius:6px;font-weight:600;"></div>
+      <button onclick="closePaymentMethodModal()" style="margin-top:16px;background:none;color:#ccc;font-size:1.1em;border:none;cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Order Placed Modal -->
+  <div id="order-placed-modal" style="display:none;position:fixed;z-index:9999;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);justify-content:center;align-items:center;">
+    <div style="background:#232323;padding:36px 32px 32px 32px;border-radius:16px;min-width:280px;max-width:90vw;box-shadow:0 4px 24px rgba(0,0,0,0.4);color:#fff;text-align:center;font-size:1.3rem;font-weight:600;">
+      ✅ Order placed successfully!
+    </div>
+  </div>
+
+
+
+
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, doc, setDoc, getDoc, query, where, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1X4GDToJMq50Y4U6QswAkjQEbzAUHMuU",
+      authDomain: "test-1-shop.firebaseapp.com",
+      projectId: "test-1-shop",
+      storageBucket: "test-1-shop.firebasestorage.app",
+      messagingSenderId: "870800150074",
+      appId: "1:870800150074:web:b90257f8ec2e6f2c51ef03",
+      measurementId: "G-550KXLVSDV"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // UI elements
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+    const authContainer = document.getElementById("auth-container");
+    const navBar = document.getElementById("nav-bar");
+    const shopUI = document.getElementById("shop-ui");
+    const cartPage = document.getElementById("cart-page");
+    const ordersPage = document.getElementById("orders-page");
+    const profilePage = document.getElementById("profile-page");
+    const productsDiv = document.getElementById("products");
+    const cartSummary = document.getElementById("cart-summary");
+    const searchInput = document.getElementById("search-input");
+
+    let allProducts = [];
+    const cart = {};
+    let currentPage = 'shop';
+
+
+
+    // Page Navigation Functions
+    window.showPage = function(page) {
+      // Hide all pages
+      shopUI.style.display = 'none';
+      cartPage.style.display = 'none';
+      ordersPage.style.display = 'none';
+      profilePage.style.display = 'none';
+      document.getElementById('tokens-page').style.display = 'none';
+      
+      // Show selected page
+      if (page === 'shop') {
+        shopUI.style.display = 'block';
+        loadProducts();
+      } else if (page === 'cart') {
+        cartPage.style.display = 'block';
+        renderCartPage();
+      } else if (page === 'orders') {
+        ordersPage.style.display = 'block';
+        loadUserOrders();
+      } else if (page === 'tokens') {
+        document.getElementById('tokens-page').style.display = 'block';
+        loadTokensPage();
+      } else if (page === 'profile') {
+        profilePage.style.display = 'block';
+        loadProfilePage();
+      }
+      
+      // Update navigation buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      
+      // Add active class to clicked button (if event exists)
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
+      
+
+      
+      currentPage = page;
+    };
+
+    function clearAuthError() {
+      const errs = document.querySelectorAll('#auth-error');
+      errs.forEach(e => { e.style.display = 'none'; e.innerText = ''; });
+    }
+    function showAuthError(msg, form) {
+      const err = form.querySelector('#auth-error');
+      if (err) {
+        err.style.display = 'block';
+        err.innerText = msg;
+      }
+    }
+    // UI switching
+    window.showLogin = () => {
+      clearAuthError();
+      loginForm.style.display = "block";
+      registerForm.style.display = "none";
+    };
+    window.showRegister = () => {
+      clearAuthError();
+      loginForm.style.display = "none";
+      registerForm.style.display = "block";
+    };
+
+    // Auth logic
+    window.login = async () => {
+      clearAuthError();
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      if (!email || !password) {
+        showAuthError("Please enter email and password.", loginForm);
+        return;
+      }
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (e) {
+        let msg = "Login failed: ";
+        if (e.code === 'auth/user-not-found') msg = "No account found with this email.";
+        else if (e.code === 'auth/wrong-password') msg = "Incorrect password.";
+        else msg += e.message;
+        showAuthError(msg, loginForm);
+      }
+    };
+
+    window.register = async () => {
+      clearAuthError();
+      const email = document.getElementById("register-email").value.trim();
+      const password = document.getElementById("register-password").value;
+      if (!email || !password) {
+        showAuthError("Please enter email and password.", registerForm);
+        return;
+      }
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Store user info in Firestore
+        const user = userCredential.user;
+        await addDoc(collection(db, "customers"), {
+          uid: user.uid,
+          email: user.email,
+          registeredAt: Date.now()
+        });
+        alert("Registration successful! You can now log in.");
+        showLogin();
+      } catch (e) {
+        let msg = "Registration failed: ";
+        if (e.code === 'auth/email-already-in-use') msg = "This email is already registered. Please log in or use another email.";
+        else msg += e.message;
+        showAuthError(msg, registerForm);
+      }
+    };
+
+    window.confirmLogout = () => {
+      if (confirm('Are you sure you want to logout?')) {
+        logout();
+      }
+    };
+
+    window.logout = async () => {
+      await signOut(auth);
+    };
+
+    // Prefill name/address for logged-in user
+    async function prefillCustomerDetails(user) {
+      try {
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          if (data.name) document.getElementById("name").value = data.name;
+          if (data.address) {
+            document.getElementById("address-street").value = data.address.street || '';
+            document.getElementById("address-apartment").value = data.address.apartment || '';
+            document.getElementById("address-city").value = data.address.city || '';
+            document.getElementById("address-state").value = data.address.state || '';
+            document.getElementById("address-pincode").value = data.address.pincode || '';
+            document.getElementById("address-country").value = data.address.country || '';
+          }
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+    }
+
+    // Optimized auth state observer
+    let autoRefreshTimer = null;
+    let tokenListener = null;
+    
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Logged in
+        authContainer.style.display = "none";
+        navBar.style.display = "block";
+        shopUI.style.display = "block";
+        document.getElementById("floating-view-cart").style.display = "block";
+        loadProducts();
+        prefillCustomerDetails(user);
+        
+        // Set up real-time token listener
+        if (tokenListener) {
+          tokenListener();
+        }
+        tokenListener = onSnapshot(doc(db, "customers", user.uid), (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            const currentTokens = data.tokens || 0;
+            
+            // Update all token displays in real-time
+            const tokenCountElements = document.querySelectorAll('[id*="token-count"]');
+            tokenCountElements.forEach(element => {
+              if (element) {
+                element.textContent = currentTokens;
+              }
+            });
+            
+            const tokenValueElements = document.querySelectorAll('[id*="token-value"]');
+            tokenValueElements.forEach(element => {
+              if (element) {
+                element.textContent = (currentTokens * 0.5).toFixed(2);
+              }
+            });
+            
+            console.log('[Customer] Token balance updated in real-time:', currentTokens);
+          }
+        }, (error) => {
+          console.error('[Customer] Error listening to token updates:', error);
+        });
+        
+        // Optimized auto-refresh with cleanup
+        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+        autoRefreshTimer = setInterval(() => {
+          if (auth.currentUser) {
+            // Only refresh if user is still logged in
+            loadUserOrders();
+          } else {
+            clearInterval(autoRefreshTimer);
+          }
+        }, 30000);
+        
+      } else {
+        // Not logged in
+        navBar.style.display = "none";
+        shopUI.style.display = "none";
+        cartPage.style.display = "none";
+        ordersPage.style.display = "none";
+        profilePage.style.display = "none";
+        document.getElementById("floating-view-cart").style.display = "none";
+        authContainer.style.display = "block";
+        showLogin();
+        
+        // Clean up all listeners and timers
+        if (productsListener) {
+          productsListener();
+          productsListener = null;
+        }
+        if (orderListener) {
+          orderListener();
+          orderListener = null;
+        }
+        if (tokenListener) {
+          tokenListener();
+          tokenListener = null;
+        }
+        if (autoRefreshTimer) {
+          clearInterval(autoRefreshTimer);
+          autoRefreshTimer = null;
+        }
+        // Clear cache
+        productsCache.clear();
+      }
+    });
+
+    // Simple price display function
+    function renderPriceHTML(markedPrice, sellingPrice) {
+      const sp = Number(sellingPrice) || 0;
+      return `<span class="selling-price">₹${sp}</span>`;
+    }
+
+    // Render products efficiently
+    function renderProducts(productsArr) {
+      const grid = document.getElementById("products-grid");
+      
+      // Use DocumentFragment for better performance
+      const fragment = document.createDocumentFragment();
+      
+      if (productsArr.length === 0) {
+        const noProducts = document.createElement("p");
+        noProducts.style.textAlign = "center";
+        noProducts.style.color = "#bbb";
+        noProducts.style.padding = "40px";
+        noProducts.textContent = "No products found.";
+        fragment.appendChild(noProducts);
+        grid.innerHTML = "";
+        grid.appendChild(fragment);
+        return;
+      }
+      
+      // Create a dynamic grid based on actual products
+      if (productsArr.length === 0) {
+        grid.innerHTML = "<p style='text-align:center;color:#bbb;padding:40px;'>No products found.</p>";
+        return;
+      }
+      
+      // Render only actual products efficiently
+      productsArr.forEach(item => {
+        cart[item.id] = cart[item.id] || { name: item.name, price: item.price, quantity: 0 };
+        const div = document.createElement("div");
+        div.className = "product";
+        
+        // Check if product is out of stock
+        const isOutOfStock = item.outOfStock || false;
+        const outOfStockBadge = isOutOfStock ? '<div style="background: #ff4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 8px; text-align: center;">🚫 OUT OF STOCK</div>' : '';
+        const buttonStyle = isOutOfStock ? 'style="opacity: 0.5; cursor: not-allowed;"' : '';
+        const buttonOnClick = isOutOfStock ? '' : `onclick="decrease('${item.id}')"`;
+        const buttonOnClickIncrease = isOutOfStock ? '' : `onclick="increase('${item.id}')"`;
+        
+        div.innerHTML = `
+          ${item.imageUrl ? `<img src=\"${item.imageUrl}\" alt=\"${item.name}\" style=\"width:75%;height:75%;object-fit:cover;border-radius:8px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;max-width:150px;max-height:150px;\" />` : `<div style=\"width:75%;height:75%;max-width:150px;max-height:150px;display:flex;align-items:center;justify-content:center;background:#232323;border-radius:8px;margin-bottom:8px;margin-left:auto;margin-right:auto;\"><svg width='48' height='48' viewBox='0 0 48 48' fill='none' style='display:block;margin:auto;'><rect width='48' height='48' rx='8' fill='#222'/><path d='M12 36l8-10 6 8 6-6 4 8H12z' fill='#444'/><circle cx='18' cy='18' r='3' fill='#444'/></svg></div>`}
+          <strong>${item.name}</strong><br/>
+          ${outOfStockBadge}
+          <div class="price-container">
+            ${renderPriceHTML(item.cp, item.sp || item.price)}
+          </div>
+          ${item.description ? `<div class=\"product-description\">${item.description}</div>` : ''}
+          <div style=\"margin-top: 10px;\">
+            <button ${buttonStyle} ${buttonOnClick}>-</button>
+            <span id=\"qty-${item.id}\">${cart[item.id].quantity}</span>
+            <button ${buttonStyle} ${buttonOnClickIncrease}>+</button>
+          </div>
+        `;
+        fragment.appendChild(div);
+      });
+      
+      // Clear and append all at once for better performance
+      grid.innerHTML = "";
+      grid.appendChild(fragment);
+    }
+    let addressSelected = false;
+    // Cart Page Functions
+    function renderCartPage() {
+      const container = document.getElementById("cart-items-container");
+      const checkoutBtn = document.getElementById("checkout-btn");
+      let total = 0;
+      let hasItems = false;
+      let html = "";
+
+      for (let id in cart) {
+        let item = cart[id];
+        if (item.quantity > 0) {
+          const price = Number(item.price) || 0;
+          const subtotal = item.quantity * price;
+          total += subtotal;
+          hasItems = true;
+          html += `
+            <div class="cart-item">
+              <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">₹${price} each</div>
+              </div>
+              <div class="cart-item-controls">
+                <button class="cart-item-qty" onclick="decrease('${id}')">-</button>
+                <span>${item.quantity}</span>
+                <button class="cart-item-qty" onclick="increase('${id}')">+</button>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      if (hasItems) {
+        html += `
+          <div class="cart-total">
+            <h3>Total</h3>
+            <div class="total-amount">₹${total}</div>
+          </div>
+        `;
+        checkoutBtn.disabled = false;
+      } else {
+        html = '<div style="text-align:center;color:#bbb;padding:40px;">Your cart is empty.</div>';
+        checkoutBtn.disabled = true;
+      }
+
+      container.innerHTML = html;
+    }
+
+    // Show cart summary as a modal card, with Checkout button (only if address is saved)
+    window.showCartSummary = async () => {
+      const modal = document.getElementById("cart-modal");
+      const content = document.getElementById("cart-modal-content");
+      const actions = document.getElementById("cart-modal-actions");
+      let total = 0;
+      let html = "";
+      let hasItems = false;
+      for (let id in cart) {
+        let item = cart[id];
+        if (item.quantity > 0) {
+          const price = Number(item.price) || 0;
+          const subtotal = item.quantity * price;
+          total += subtotal;
+          html += `${item.name} x ${item.quantity} = ₹${subtotal}<br>`;
+          hasItems = true;
+        }
+      }
+      if (hasItems) {
+        html = `<div class='cart-items'>${html}</div><div class='cart-total'>Total: ₹${total}</div>`;
+        actions.style.display = '';
+      } else {
+        html = `<div class='empty-cart'>Your cart is empty.</div>`;
+        actions.style.display = 'none';
+      }
+      content.innerHTML = html;
+      modal.style.display = "flex";
+      // Check for address selection
+      let addressOk = false;
+      if (localStorage.getItem('addressSelected') === 'true') addressOk = true;
+      // No checkout button in modal, so nothing to enable/disable here
+      if (!addressOk && hasItems) {
+        content.innerHTML += `<div style='color:#ff4444;margin-top:12px;text-align:center;'>Please select your address before checkout.</div>`;
+      }
+    };
+    function showOrderPlacedModal() {
+      const modal = document.getElementById('order-placed-modal');
+      modal.style.display = 'flex';
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 2000);
+    }
+    window.placeOrderFromCart = async () => {
+      const user = auth.currentUser;
+      let address = null;
+      let name = '';
+      if (user) {
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const data = customerDoc.data();
+            name = data.name || '';
+            address = data.address || null;
+          }
+        } catch {}
+      }
+      if (!address || !address.street || !address.city || !address.state || !address.pincode || !address.country) {
+        alert('Please add your address before placing an order.');
+        return;
+      }
+      // Prepare order items
+      const orderItems = {};
+      for (let id in cart) {
+        if (cart[id].quantity > 0) {
+          orderItems[id] = cart[id];
+        }
+      }
+      if (Object.keys(orderItems).length === 0) {
+        alert('Your cart is empty.');
+        return;
+      }
+      try {
+        // Get full customer profile
+        let customerProfile = { name, address, email: user ? user.email : "" };
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const profileData = customerDoc.data();
+            customerProfile = {
+              name: profileData.name || name,
+              email: user.email,
+              birthdate: profileData.birthdate || '',
+              gender: profileData.gender || '',
+              address: profileData.address || address
+            };
+          }
+        } catch (e) {
+          console.log('Error fetching customer profile:', e);
+        }
+
+        await addDoc(collection(db, "orders"), {
+          customer: customerProfile,
+          customer_uid: user.uid,
+          customer_email: user.email,
+          customer_name: customerProfile.name,
+          customer_birthdate: customerProfile.birthdate,
+          customer_gender: customerProfile.gender,
+          customer_address: customerProfile.address,
+          cart: orderItems,
+          createdAt: Date.now(),
+          created_at: new Date().toISOString(),
+          status: "new"
+        });
+        
+        // Award store credits based on order amount
+        let totalAmount = 0;
+        for (let id in cart) {
+          if (cart[id].quantity > 0) {
+            totalAmount += cart[id].quantity * cart[id].price;
+          }
+        }
+        
+        let tokensEarned = 0;
+        if (totalAmount < 100) {
+          tokensEarned = 10;
+        } else if (totalAmount < 300) {
+          tokensEarned = 25;
+        } else if (totalAmount < 500) {
+          tokensEarned = 50;
+        } else {
+          // For orders >= 500, award 100 tokens
+          tokensEarned = 100;
+        }
+        
+        if (tokensEarned > 0) {
+          // Update customer store credits in Firestore
+          try {
+            const customerRef = doc(db, "customers", user.uid);
+            const customerDoc = await getDoc(customerRef);
+            if (customerDoc.exists()) {
+              const currentTokens = customerDoc.data().tokens || 0;
+              await updateDoc(customerRef, {
+                tokens: currentTokens + tokensEarned,
+                lastTokenUpdate: Date.now()
+              });
+              console.log(`[Customer] Cart order - Awarded ${tokensEarned} store credits. Total: ${currentTokens + tokensEarned}`);
+            }
+          } catch (e) {
+            console.error('[Customer] Error updating tokens for cart order:', e);
+          }
+          
+          // Show store credit notification and refresh display
+          setTimeout(() => {
+            alert(`🎉 You earned ${tokensEarned} store credits! (${tokensEarned * 0.5}₹ value)`);
+            refreshTokenDisplay(); // Refresh store credit display
+            if (currentPage === 'tokens') {
+              loadTokensPage(); // Refresh store credits page if currently viewing it
+            }
+          }, 500);
+        }
+        
+        showOrderPlacedModal();
+        closeCartModal();
+        // Clear cart after successful order
+        for (let id in cart) cart[id].quantity = 0;
+        updateCart();
+        filterProducts();
+        setTimeout(() => { location.reload(); }, 2000);
+      } catch (e) {
+        alert("❌ Order failed: " + e.message);
+      }
+    };
+    window.closeCartModal = () => {
+      document.getElementById("cart-modal").style.display = "none";
+    };
+
+    // Category and search filter variables
+    let currentCategory = 'all';
+    let currentSearchQuery = '';
+
+    // Shuffle array function (Fisher-Yates algorithm)
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    // Category filter function
+    function filterProducts() {
+      let filteredProducts = allProducts;
+      
+      // Apply category filter
+      if (currentCategory !== 'all') {
+        filteredProducts = filteredProducts.filter(p => p.category === currentCategory);
+      }
+      
+      // Apply search filter
+      if (currentSearchQuery) {
+        filteredProducts = filteredProducts.filter(p => 
+          p.name.toLowerCase().includes(currentSearchQuery) || 
+          (p.description && p.description.toLowerCase().includes(currentSearchQuery))
+        );
+      }
+      
+      // Shuffle the filtered products for random order
+      filteredProducts = shuffleArray(filteredProducts);
+      
+      renderProducts(filteredProducts);
+    }
+
+    // Category button click handlers
+    document.addEventListener('DOMContentLoaded', function() {
+      const categoryButtons = document.querySelectorAll('.category-btn');
+      categoryButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Remove active class from all buttons
+          categoryButtons.forEach(btn => btn.classList.remove('active'));
+          // Add active class to clicked button
+          this.classList.add('active');
+          // Update current category
+          currentCategory = this.getAttribute('data-category');
+          // Filter products
+          filterProducts();
+        });
+      });
+    });
+
+    // Search filter function
+    if (searchInput) {
+    searchInput.addEventListener("input", function() {
+      currentSearchQuery = searchInput.value.trim().toLowerCase();
+      filterProducts();
+    });
+    }
+
+    // Optimized real-time products listener
+    let productsListener = null;
+    let productsCache = new Map();
+    
+    async function loadProducts() {
+      try {
+        // Remove existing listener
+        if (productsListener) {
+          productsListener();
+        }
+        
+        // Set up real-time listener for products with caching
+        productsListener = onSnapshot(collection(db, "products"), (snapshot) => {
+          const changes = snapshot.docChanges();
+          let hasChanges = false;
+          
+          changes.forEach((change) => {
+            const docId = change.doc.id;
+            const data = change.doc.data();
+            
+            if (change.type === 'added' || change.type === 'modified') {
+              productsCache.set(docId, { 
+                id: docId, 
+                name: data.name, 
+                price: data.price, 
+                imageUrl: data.imageUrl || '',
+                category: data.category || '',
+                description: data.description || '',
+                outOfStock: data.outOfStock || false
+              });
+              hasChanges = true;
+            } else if (change.type === 'removed') {
+              productsCache.delete(docId);
+              hasChanges = true;
+            }
+          });
+          
+          if (hasChanges) {
+            allProducts = Array.from(productsCache.values());
+            filterProducts();
+          }
+        }, (error) => {
+          console.error("Error loading products:", error);
+          productsDiv.innerHTML = "<p style='color:red;'>Error loading products</p>";
+        });
+
+      } catch (error) {
+        console.error("Error loading products:", error);
+        productsDiv.innerHTML = "<p style='color:red;'>Error loading products</p>";
+      }
+    }
+
+    window.increase = (id) => {
+      // Check if product is out of stock
+      const product = allProducts.find(p => p.id === id);
+      if (product && product.outOfStock) {
+        alert('This product is currently out of stock.');
+        return;
+      }
+      cart[id].quantity++;
+      document.getElementById(`qty-${id}`).innerText = cart[id].quantity;
+      updateCart();
+    };
+
+    window.decrease = (id) => {
+      if (cart[id].quantity > 0) {
+        cart[id].quantity--;
+        document.getElementById(`qty-${id}`).innerText = cart[id].quantity;
+        updateCart();
+      }
+    };
+
+    function updateCart() {
+      let total = 0;
+      let summary = "<h3>Cart Summary</h3>";
+      let hasItems = false;
+      for (let id in cart) {
+        let item = cart[id];
+        if (item.quantity > 0) {
+          const subtotal = item.quantity * item.price;
+          total += subtotal;
+          summary += `${item.name} x ${item.quantity} = ₹${subtotal}<br>`;
+          hasItems = true;
+        }
+      }
+      if (total > 0) {
+        summary += `<br><strong>Total: ₹${total}</strong>`;
+      } else {
+        summary = "<h3>Cart Summary</h3><p>Your cart is empty.</p>";
+      }
+      
+      // Update cart summary in modal if it exists
+      const cartSummaryContent = document.getElementById("cart-summary-content");
+      if (cartSummaryContent) {
+        cartSummaryContent.innerHTML = summary;
+      }
+      
+      // Update cart page if it's currently visible
+      if (currentPage === 'cart') {
+        renderCartPage();
+      }
+      
+      // Enable/disable checkout button in grid (re-attach event handler)
+      setTimeout(() => {
+        const checkoutBtn = document.getElementById("checkout-btn");
+        if (checkoutBtn) {
+          checkoutBtn.disabled = !hasItems;
+          checkoutBtn.onclick = openPaymentMethodModal;
+        }
+      }, 0);
+    }
+
+    window.openCheckoutModal = () => {
+      document.getElementById("checkout-modal").style.display = "flex";
+      // Prefill name/address if available
+      prefillCustomerDetails(auth.currentUser);
+    };
+    window.closeCheckoutModal = () => {
+      document.getElementById("checkout-modal").style.display = "none";
+    };
+
+    window.placeOrder = async () => {
+      const name = document.getElementById("name").value.trim();
+      const address = {
+        street: document.getElementById("address-street").value.trim(),
+        apartment: document.getElementById("address-apartment").value.trim(),
+        city: document.getElementById("address-city").value.trim(),
+        state: document.getElementById("address-state").value.trim(),
+        pincode: document.getElementById("address-pincode").value.trim(),
+        country: document.getElementById("address-country").value.trim()
+      };
+      if (!name || !address.street || !address.city || !address.state || !address.pincode || !address.country) {
+        alert("Please fill in all address fields.");
+        return;
+      }
+      const orderItems = {};
+      for (let id in cart) {
+        if (cart[id].quantity > 0) {
+          orderItems[id] = cart[id];
+        }
+      }
+      if (Object.keys(orderItems).length === 0) {
+        alert("Your cart is empty.");
+        return;
+      }
+      try {
+        // Save order
+        const user = auth.currentUser;
+        
+        // Get full customer profile
+        let customerProfile = { name, address, email: user ? user.email : "" };
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const profileData = customerDoc.data();
+            customerProfile = {
+              name: profileData.name || name,
+              email: user.email,
+              birthdate: profileData.birthdate || '',
+              gender: profileData.gender || '',
+              address: profileData.address || address
+            };
+          }
+        } catch (e) {
+          console.log('Error fetching customer profile:', e);
+        }
+
+        await addDoc(collection(db, "orders"), {
+          customer: customerProfile,
+          customer_uid: user.uid,
+          customer_email: user.email,
+          customer_name: customerProfile.name,
+          customer_birthdate: customerProfile.birthdate,
+          customer_gender: customerProfile.gender,
+          customer_address: customerProfile.address,
+          cart: orderItems,
+          createdAt: Date.now(),
+          created_at: new Date().toISOString(),
+          status: "new"
+        });
+        
+        // Save name/address to customer profile
+        if (user) {
+          await setDoc(doc(db, "customers", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            name,
+            address,
+            registeredAt: Date.now()
+          }, { merge: true });
+        }
+        
+        // Award store credits based on order amount
+        let totalAmount = 0;
+        for (let id in cart) {
+          if (cart[id].quantity > 0) {
+            totalAmount += cart[id].quantity * cart[id].price;
+          }
+        }
+        
+        let tokensEarned = 0;
+        if (totalAmount < 100) {
+          tokensEarned = 10;
+        } else if (totalAmount < 300) {
+          tokensEarned = 25;
+        } else if (totalAmount < 500) {
+          tokensEarned = 50;
+        } else {
+          // For orders >= 500, award 100 tokens
+          tokensEarned = 100;
+        }
+        
+        if (tokensEarned > 0) {
+          // Update customer store credits in Firestore
+          try {
+            const customerRef = doc(db, "customers", user.uid);
+            const customerDoc = await getDoc(customerRef);
+            if (customerDoc.exists()) {
+              const currentTokens = customerDoc.data().tokens || 0;
+              await updateDoc(customerRef, {
+                tokens: currentTokens + tokensEarned,
+                lastTokenUpdate: Date.now()
+              });
+              console.log(`[Customer] Direct order - Awarded ${tokensEarned} store credits. Total: ${currentTokens + tokensEarned}`);
+            }
+          } catch (e) {
+            console.error('[Customer] Error updating tokens for direct order:', e);
+          }
+          
+          // Show store credit notification and refresh display
+          setTimeout(() => {
+            alert(`🎉 You earned ${tokensEarned} store credits! (${tokensEarned * 0.5}₹ value)`);
+            refreshTokenDisplay(); // Refresh store credit display
+            if (currentPage === 'tokens') {
+              loadTokensPage(); // Refresh store credits page if currently viewing it
+            }
+          }, 500);
+        }
+        
+        alert("✅ Order placed successfully!");
+        // Clear cart after successful order
+        for (let id in cart) cart[id].quantity = 0;
+        updateCart();
+        filterProducts();
+        closeCheckoutModal();
+        location.reload();
+      } catch (e) {
+        alert("❌ Order failed: " + e.message);
+      }
+    };
+
+    // Forgot password modal logic
+    window.openForgotModal = () => {
+      const modal = document.getElementById("forgot-modal");
+      modal.classList.add("active");
+      document.getElementById("forgot-email").value = "";
+      const msgDiv = document.getElementById("forgot-message");
+      msgDiv.style.display = "none";
+      msgDiv.innerText = "";
+    };
+    window.closeForgotModal = () => {
+      const modal = document.getElementById("forgot-modal");
+      modal.classList.remove("active");
+    };
+    window.sendResetEmail = async () => {
+      const email = document.getElementById("forgot-email").value.trim();
+      const msgDiv = document.getElementById("forgot-message");
+      msgDiv.style.display = "none";
+      msgDiv.innerText = "";
+      if (!email) {
+        msgDiv.innerText = "Please enter your email.";
+        msgDiv.style.display = "block";
+        msgDiv.style.color = "#ffc107";
+        return;
+      }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        msgDiv.innerText = "A password reset link has been sent to your email.";
+        msgDiv.style.display = "block";
+        msgDiv.style.color = "#28a745";
+      } catch (e) {
+        msgDiv.innerText = e.code === 'auth/user-not-found' ? "No account found with this email." : ("Error: " + e.message);
+        msgDiv.style.display = "block";
+        msgDiv.style.color = "#ff4444";
+      }
+    };
+
+    // Add Address modal logic
+    window.openAddressModal = async () => {
+      const modal = document.getElementById("address-modal");
+      const fields = [
+        "modal-address-street",
+        "modal-address-apartment",
+        "modal-address-city",
+        "modal-address-state",
+        "modal-address-pincode",
+        "modal-address-country"
+      ];
+      fields.forEach(f => document.getElementById(f).value = "");
+      const successDiv = document.getElementById("address-success");
+      const errorDiv = document.getElementById("address-error");
+      successDiv.style.display = "none";
+      errorDiv.style.display = "none";
+      // Prefill with current address if available
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const data = customerDoc.data();
+            if (data.address) {
+              document.getElementById("modal-address-street").value = data.address.street || '';
+              document.getElementById("modal-address-apartment").value = data.address.apartment || '';
+              document.getElementById("modal-address-city").value = data.address.city || '';
+              document.getElementById("modal-address-state").value = data.address.state || '';
+              document.getElementById("modal-address-pincode").value = data.address.pincode || '';
+              document.getElementById("modal-address-country").value = data.address.country || '';
+            }
+          }
+        } catch {}
+      }
+      modal.style.display = "flex";
+    };
+    window.closeAddressModal = () => {
+      document.getElementById("address-modal").style.display = "none";
+    };
+    // Profile Page Functions
+    async function loadProfilePage() {
+      console.log("Loading profile page...");
+      const display = document.getElementById("current-profile-display");
+      if (!display) {
+        console.error("Profile display element not found");
+        return;
+      }
+      
+      const user = auth.currentUser;
+      console.log("Current user:", user ? user.email : "Not logged in");
+      
+      if (!user) {
+        display.innerHTML = '<div style="color:#ff4444;text-align:center;">Not logged in.</div>';
+        return;
+      }
+
+      try {
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          let profileHtml = '<h3 style="margin:0 0 12px 0;color:#f5f5f5;">Current Profile</h3>';
+          
+          if (data.name || data.birthdate || data.gender || data.address) {
+            profileHtml += '<div style="line-height:1.6;color:#ccc;">';
+            if (data.name) profileHtml += `<strong>Name:</strong> ${data.name}<br>`;
+            if (data.birthdate) profileHtml += `<strong>Birth Date:</strong> ${data.birthdate}<br>`;
+            if (data.gender) profileHtml += `<strong>Gender:</strong> ${data.gender}<br>`;
+            if (data.address && data.address.street) {
+              profileHtml += `<strong>Address:</strong><br>`;
+              profileHtml += `${data.address.street}${data.address.apartment ? ', ' + data.address.apartment : ''}<br>`;
+              profileHtml += `${data.address.city}, ${data.address.state} - ${data.address.pincode}<br>`;
+              profileHtml += `${data.address.country}`;
+            }
+            profileHtml += '</div>';
+          } else {
+            profileHtml += '<div style="color:#26F7FD;text-align:center;">No profile information saved. Please update your profile below.</div>';
+          }
+          
+          display.innerHTML = profileHtml;
+          
+          // Prefill form with current data
+          document.getElementById("profile-name").value = data.name || '';
+          document.getElementById("profile-email").value = user.email || '';
+          document.getElementById("profile-birthdate").value = data.birthdate || '';
+          document.getElementById("profile-gender").value = data.gender || '';
+          
+          if (data.address) {
+            document.getElementById("profile-address-street").value = data.address.street || '';
+            document.getElementById("profile-address-apartment").value = data.address.apartment || '';
+            document.getElementById("profile-address-city").value = data.address.city || '';
+            document.getElementById("profile-address-state").value = data.address.state || '';
+            document.getElementById("profile-address-pincode").value = data.address.pincode || '';
+            document.getElementById("profile-address-country").value = data.address.country || '';
+          }
+          
+                  // Update token display
+        const currentTokens = data.tokens || 0;
+        document.getElementById("profile-token-count").textContent = currentTokens;
+        document.getElementById("profile-token-value").textContent = (currentTokens * 0.5).toFixed(2);
+        
+        // Load token summary
+        await loadTokenSummary();
+        } else {
+          display.innerHTML = '<div style="color:#26F7FD;text-align:center;">No profile information saved. Please update your profile below.</div>';
+          // Set email as it's available from auth
+          document.getElementById("profile-email").value = user.email || '';
+          
+          // Reset token display for new users
+          document.getElementById("profile-token-count").textContent = "0";
+          document.getElementById("profile-token-value").textContent = "0.00";
+        }
+      } catch (e) {
+        display.innerHTML = '<div style="color:#ff4444;text-align:center;">Failed to load profile.</div>';
+      }
+    }
+
+    window.saveProfile = async () => {
+      console.log("Saving profile...");
+      try {
+        const nameInput = document.getElementById("profile-name");
+        const birthdateInput = document.getElementById("profile-birthdate");
+        const genderInput = document.getElementById("profile-gender");
+        const streetInput = document.getElementById("profile-address-street");
+        const apartmentInput = document.getElementById("profile-address-apartment");
+        const cityInput = document.getElementById("profile-address-city");
+        const stateInput = document.getElementById("profile-address-state");
+        const pincodeInput = document.getElementById("profile-address-pincode");
+        const countryInput = document.getElementById("profile-address-country");
+        
+        console.log("Form elements found:", {
+          name: !!nameInput,
+          birthdate: !!birthdateInput,
+          gender: !!genderInput,
+          street: !!streetInput,
+          apartment: !!apartmentInput,
+          city: !!cityInput,
+          state: !!stateInput,
+          pincode: !!pincodeInput,
+          country: !!countryInput
+        });
+        
+        if (!nameInput || !birthdateInput || !genderInput || !streetInput || 
+            !apartmentInput || !cityInput || !stateInput || !pincodeInput || !countryInput) {
+          alert("Profile form elements not found. Please refresh the page.");
+          return;
+        }
+        
+        const name = nameInput.value.trim();
+        const birthdate = birthdateInput.value;
+        const gender = genderInput.value;
+        const address = {
+          street: streetInput.value.trim(),
+          apartment: apartmentInput.value.trim(),
+          city: cityInput.value.trim(),
+          state: stateInput.value.trim(),
+          pincode: pincodeInput.value.trim(),
+          country: countryInput.value.trim()
+        };
+
+      if (!name) {
+        alert("Please enter your name.");
+        return;
+      }
+
+      const user = auth.currentUser;
+      if (!user) {
+        alert("Not logged in.");
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "customers", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          name,
+          birthdate,
+          gender,
+          address,
+          registeredAt: Date.now()
+        }, { merge: true });
+        
+        alert("✅ Profile saved successfully!");
+        loadProfilePage(); // Refresh the display
+      } catch (e) {
+        alert("❌ Failed to save profile: " + e.message);
+      }
+      } catch (e) {
+        alert("❌ Error accessing profile form: " + e.message);
+      }
+    };
+
+    window.saveProfileAddress = async () => {
+      try {
+        const fields = [
+          "modal-address-street",
+          "modal-address-apartment",
+          "modal-address-city",
+          "modal-address-state",
+          "modal-address-pincode",
+          "modal-address-country"
+        ];
+        
+        // Check if all form elements exist
+        const formElements = fields.map(id => document.getElementById(id));
+        if (formElements.some(el => !el)) {
+          alert("Address form elements not found. Please refresh the page.");
+          return;
+        }
+        
+        const address = {
+          street: document.getElementById("modal-address-street").value.trim(),
+          apartment: document.getElementById("modal-address-apartment").value.trim(),
+          city: document.getElementById("modal-address-city").value.trim(),
+          state: document.getElementById("modal-address-state").value.trim(),
+          pincode: document.getElementById("modal-address-pincode").value.trim(),
+          country: document.getElementById("modal-address-country").value.trim()
+        };
+      const successDiv = document.getElementById("address-success");
+      const errorDiv = document.getElementById("address-error");
+      successDiv.style.display = "none";
+      errorDiv.style.display = "none";
+      if (!address.street || !address.city || !address.state || !address.pincode || !address.country) {
+        errorDiv.innerText = "Please fill in all address fields.";
+        errorDiv.style.display = "block";
+        return;
+      }
+      const user = auth.currentUser;
+      if (!user) {
+        errorDiv.innerText = "Not logged in.";
+        errorDiv.style.display = "block";
+        return;
+      }
+      try {
+        await setDoc(doc(db, "customers", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          address,
+          registeredAt: Date.now()
+        }, { merge: true });
+        successDiv.innerText = "Address saved!";
+        successDiv.style.display = "block";
+        // Automatically select address for checkout
+        addressSelected = true;
+        localStorage.setItem('addressSelected', 'true');
+        // Update UI: re-render saved address section and enable checkout if cart modal is open
+        // showSavedAddressInGrid(); // Function not implemented yet
+        // No checkout button in modal, so nothing to enable/disable here
+      } catch (e) {
+        errorDiv.innerText = "Failed to save address.";
+        errorDiv.style.display = "block";
+      }
+      } catch (e) {
+        alert("❌ Error accessing address form: " + e.message);
+      }
+    };
+
+    // Orders Modal logic
+    window.openOrdersModal = () => {
+      document.getElementById("orders-modal").style.display = "flex";
+      loadUserOrders();
+    };
+    window.closeOrdersModal = () => {
+      document.getElementById("orders-modal").style.display = "none";
+    };
+
+    // Real-time order listener
+    let orderListener = null;
+    
+    async function loadUserOrders() {
+      const ordersList = document.getElementById("orders-list");
+      const ordersContainer = document.getElementById("orders-container");
+      const container = ordersContainer || ordersList;
+      container.innerHTML = "Loading...";
+      const user = auth.currentUser;
+      if (!user) {
+        container.innerHTML = "Not logged in.";
+        return;
+      }
+      
+      // Remove existing listener
+      if (orderListener) {
+        orderListener();
+      }
+      
+      try {
+        console.log('[Customer] Loading orders for user:', user.email);
+        
+        // Query orders by customer_email
+        const q = query(collection(db, "orders"), where("customer_email", "==", user.email));
+        orderListener = onSnapshot(q, (snapshot) => {
+          console.log('[Customer] Orders query result:', {
+            totalOrders: snapshot.size,
+            userEmail: user.email,
+            empty: snapshot.empty
+          });
+          
+          if (snapshot.empty) {
+            container.innerHTML = "<p>No orders found.</p>";
+            return;
+          }
+          
+          let html = "";
+          snapshot.forEach(docSnap => {
+            const order = docSnap.data();
+            console.log('[Customer] Order data:', {
+              orderId: docSnap.id,
+              customerEmail: order.customer_email,
+              customerEmailAlt: order.customer?.email,
+              createdAt: order.createdAt,
+              created_at: order.created_at,
+              status: order.status
+            });
+            
+            let itemsHtml = "";
+            let total = 0;
+            for (let id in order.cart) {
+              const item = order.cart[id];
+              const itemPrice = Number(item.price) || 0;
+              const subtotal = itemPrice * item.quantity;
+              total += subtotal;
+              itemsHtml += `<div style='background:#232323;padding:8px 12px;border-radius:6px;margin-bottom:6px;'>
+                <strong>${item.name}</strong> x ${item.quantity} <span style='float:right;'>₹${itemPrice * item.quantity}</span>
+              </div>`;
+            }
+            
+            const statusLabels = {
+              'new': '<span style="color:#26F7FD;font-weight:bold;">🆕 New Order</span>',
+              'confirmed': '<span style="color:#17a2b8;font-weight:bold;">✅ Confirmed</span>',
+              'preparing': '<span style="color:#fd7e14;font-weight:bold;">👨‍🍳 Preparing</span>',
+              'ready': '<span style="color:#6f42c1;font-weight:bold;">📦 Ready</span>',
+              'dispatched': '<span style="color:#17f057;font-weight:bold;">🚚 Dispatched</span>',
+              'arriving': '<span style="color:#26F7FD;font-weight:bold;">🚗 Arriving</span>',
+              'reached': '<span style="color:#28a745;font-weight:bold;">📍 Reached</span>',
+              'delivered': '<span style="color:#28a745;font-weight:bold;">✅ Delivered</span>',
+              'cancelled': '<span style="color:#dc3545;font-weight:bold;">❌ Cancelled</span>'
+            };
+            const statusLabel = statusLabels[order.status] || '<span style="color:#ffc107;font-weight:bold;">Active</span>';
+            
+            // Handle timestamp parsing for display
+            let orderDate = order.createdAt || order.created_at || Date.now();
+            if (typeof orderDate === 'string') {
+              orderDate = new Date(orderDate).getTime();
+            }
+            
+            // Handle address display with proper null checks
+            let addressDisplay = '';
+            if (order.customer && order.customer.address) {
+              if (typeof order.customer.address === 'object') {
+                addressDisplay = `${order.customer.address.street || ''}${order.customer.address.apartment ? ', ' + order.customer.address.apartment : ''}, ${order.customer.address.city || ''}, ${order.customer.address.state || ''} - ${order.customer.address.pincode || ''}, ${order.customer.address.country || ''}`;
+              } else {
+                addressDisplay = order.customer.address;
+              }
+            } else if (order.customer_address) {
+              if (typeof order.customer_address === 'object') {
+                addressDisplay = `${order.customer_address.street || ''}${order.customer_address.apartment ? ', ' + order.customer_address.apartment : ''}, ${order.customer_address.city || ''}, ${order.customer_address.state || ''} - ${order.customer_address.pincode || ''}, ${order.customer_address.country || ''}`;
+              } else {
+                addressDisplay = order.customer_address;
+              }
+            } else {
+              addressDisplay = 'Address not available';
+            }
+            
+            html += `<div class='order-card' style="animation: fadeIn 0.5s ease-in;">
+              <div><strong>Order Date:</strong> ${new Date(orderDate).toLocaleString()}</div>
+              <div><strong>Status:</strong> ${statusLabel}</div>
+              <div style='margin:8px 0;'>${itemsHtml}</div>
+              <div><strong>Total:</strong> ₹${total}</div>
+              <div><strong>Address:</strong> ${addressDisplay}</div>
+              ${order.status !== 'delivered' && order.status !== 'cancelled' ? `<button onclick="cancelOrder('${docSnap.id}')" style='margin-top:10px;background:#ff4444;'>Cancel Order</button>` : ''}
+            </div>`;
+          });
+          container.innerHTML = html;
+        }, (error) => {
+          console.error('[Customer] Orders query error:', error);
+          container.innerHTML = `<span style='color:red;'>Error loading orders: ${error.message}</span>`;
+        });
+      } catch (e) {
+        console.error('[Customer] Error setting up orders listener:', e);
+        container.innerHTML = `<span style='color:red;'>Error loading orders: ${e.message}</span>`;
+      }
+    }
+
+    window.cancelOrder = async (orderId) => {
+      try {
+        await setDoc(doc(db, "orders", orderId), { status: "cancelled" }, { merge: true });
+        loadUserOrders();
+      } catch (e) {
+        alert("Failed to cancel order: " + e.message);
+      }
+    };
+
+
+    // Payment method modal functions
+    window.openPaymentMethodModal = async () => {
+      document.getElementById('payment-method-modal').style.display = 'flex';
+      document.getElementById('payment-status-msg').style.display = 'none';
+      
+      // Load and display token balance
+      await loadTokenPaymentInfo();
+    };
+
+    window.closePaymentMethodModal = () => {
+      document.getElementById('payment-method-modal').style.display = 'none';
+    };
+
+    // Load token payment information
+    async function loadTokenPaymentInfo() {
+      const user = auth.currentUser;
+      const tokenInfo = document.getElementById('token-payment-info');
+      
+      if (!user || !tokenInfo) {
+        if (tokenInfo) {
+          tokenInfo.textContent = 'Login required';
+        }
+        return;
+      }
+
+      try {
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          const currentTokens = data.tokens || 0;
+          const tokenValue = currentTokens * 0.5;
+          
+          // Calculate cart total for comparison
+          let cartTotal = 0;
+          for (let id in cart) {
+            if (cart[id].quantity > 0) {
+              cartTotal += cart[id].quantity * cart[id].price;
+            }
+          }
+          
+          const tokensNeeded = Math.ceil(cartTotal / 0.5);
+          
+          if (cartTotal === 0) {
+            tokenInfo.textContent = `${currentTokens} store credits available (₹${tokenValue.toFixed(2)})`;
+          } else if (currentTokens >= tokensNeeded) {
+            tokenInfo.textContent = `${currentTokens} store credits available - Can pay ₹${cartTotal.toFixed(2)} (${tokensNeeded} store credits)`;
+          } else {
+            const shortfall = tokensNeeded - currentTokens;
+            const shortfallValue = shortfall * 0.5;
+                          tokenInfo.textContent = `${currentTokens} store credits available - Need ${shortfall} more store credits (₹${shortfallValue.toFixed(2)})`;
+          }
+        } else {
+                      tokenInfo.textContent = 'No store credits available';
+        }
+      } catch (e) {
+        console.error('[Customer] Error loading token payment info:', e);
+        tokenInfo.textContent = 'Error loading token balance';
+      }
+    }
+
+    // Attach payment method buttons
+    setTimeout(() => {
+      const tokenBtn = document.getElementById('token-payment-btn');
+      const upiBtn = document.getElementById('upi-payment-btn');
+      const codBtn = document.getElementById('cod-payment-btn');
+      
+      if (tokenBtn) tokenBtn.onclick = async () => {
+        await handleTokenPayment();
+      };
+      
+      if (upiBtn) upiBtn.onclick = async () => {
+        await handleUpiPayment();
+      };
+      
+      if (codBtn) codBtn.onclick = async () => {
+        await handleCodPayment();
+      };
+    }, 0);
+
+    // UPI Payment Handler
+    async function handleUpiPayment() {
+      const user = auth.currentUser;
+      const statusMsg = document.getElementById('payment-status-msg');
+      
+      if (!user) {
+        statusMsg.innerText = '❌ Not logged in.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        return;
+      }
+
+      // Get user details and address
+      let name = '';
+      let address = null;
+      try {
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          name = data.name || '';
+          address = data.address || null;
+        }
+      } catch {}
+
+      if (!address || !address.street || !address.city || !address.state || !address.pincode || !address.country) {
+        statusMsg.innerText = '❌ Please add your address before placing an order.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        setTimeout(() => {
+          closePaymentMethodModal();
+          showPage('profile');
+        }, 2000);
+        return;
+      }
+
+      // Prepare order items
+      const orderItems = {};
+      for (let id in cart) {
+        if (cart[id].quantity > 0) {
+          orderItems[id] = cart[id];
+        }
+      }
+
+      if (Object.keys(orderItems).length === 0) {
+        statusMsg.innerText = '❌ Your cart is empty.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        return;
+      }
+
+      // Create pending payment request
+      try {
+        statusMsg.innerText = '⏳ Sending UPI payment request...';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#2d2d2d';
+        statusMsg.style.color = '#f57c00';
+
+        // Get full customer profile for UPI payment
+        let customerProfile = { name, address, email: user.email };
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const profileData = customerDoc.data();
+            customerProfile = {
+              name: profileData.name || name,
+              email: user.email,
+              birthdate: profileData.birthdate || '',
+              gender: profileData.gender || '',
+              address: profileData.address || address
+            };
+          }
+        } catch (e) {
+          console.log('Error fetching customer profile for UPI:', e);
+        }
+
+        const paymentDocRef = await addDoc(collection(db, "pending_payments"), {
+          customer_uid: user.uid,
+          customer_email: user.email,
+          customer_name: customerProfile.name,
+          customer_birthdate: customerProfile.birthdate,
+          customer_gender: customerProfile.gender,
+          customer_address: customerProfile.address,
+          cart: orderItems,
+          created_at: new Date().toISOString(),
+          status: 'pending',
+          payment_method: 'upi'
+        });
+
+        statusMsg.innerText = '⏳ Waiting for shopkeeper approval...';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#1976d2';
+
+        // Listen for approval
+        const unsub = onSnapshot(doc(db, "pending_payments", paymentDocRef.id), async (docSnap) => {
+          const data = docSnap.data();
+            if (data && data.status === "approved") {
+            unsub();
+            
+              statusMsg.innerText = '✅ Order is accepted... will be delivered soon.';
+            statusMsg.style.background = '#1a1a1a';
+            statusMsg.style.color = '#2e7d32';
+            
+            // Award store credits based on order amount
+            let totalAmount = 0;
+            for (let id in cart) {
+              if (cart[id].quantity > 0) {
+                totalAmount += cart[id].quantity * cart[id].price;
+              }
+            }
+            
+            let tokensEarned = 0;
+            if (totalAmount < 100) {
+              tokensEarned = 10;
+            } else if (totalAmount < 300) {
+              tokensEarned = 25;
+            } else if (totalAmount < 500) {
+              tokensEarned = 50;
+            } else {
+              // For orders >= 500, award 100 tokens
+              tokensEarned = 100;
+            }
+            
+            if (tokensEarned > 0) {
+              // Update customer store credits in Firestore
+              try {
+                const customerRef = doc(db, "customers", user.uid);
+                const customerDoc = await getDoc(customerRef);
+                if (customerDoc.exists()) {
+                  const currentTokens = customerDoc.data().tokens || 0;
+                  await updateDoc(customerRef, {
+                    tokens: currentTokens + tokensEarned
+                  });
+                  console.log(`[Customer] Awarded ${tokensEarned} store credits. Total: ${currentTokens + tokensEarned}`);
+                }
+              } catch (e) {
+                console.error('[Customer] Error updating tokens:', e);
+              }
+              
+              // Show store credit notification and refresh display
+              setTimeout(() => {
+                alert(`🎉 You earned ${tokensEarned} store credits! (${tokensEarned * 0.5}₹ value)`);
+                refreshTokenDisplay(); // Refresh store credit display
+                if (currentPage === 'tokens') {
+                  loadTokensPage(); // Refresh store credits page if currently viewing it
+                }
+              }, 500);
+            }
+            
+            // Clear cart and close modal
+            setTimeout(() => {
+              for (let id in cart) cart[id].quantity = 0;
+              updateCart();
+              filterProducts();
+              closePaymentMethodModal();
+              showOrderPlacedModal();
+              // Clear cart summary display
+              const cartSummaryContent = document.getElementById("cart-summary-content");
+              if (cartSummaryContent) {
+                cartSummaryContent.innerHTML = "<h3>Cart Summary</h3><p>Your cart is empty.</p>";
+              }
+            }, 2000);
+          } else if (data && data.status === "rejected") {
+            unsub();
+            statusMsg.innerText = '❌ Order rejected';
+            statusMsg.style.background = '#1a1a1a';
+            statusMsg.style.color = '#c62828';
+            setTimeout(() => closePaymentMethodModal(), 3000);
+          }
+        });
+      } catch (e) {
+        statusMsg.innerText = '❌ Error: ' + (e.message || e);
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#c62828';
+      }
+    }
+
+    // COD Payment Handler
+    async function handleCodPayment() {
+      const user = auth.currentUser;
+      const statusMsg = document.getElementById('payment-status-msg');
+      
+      if (!user) {
+        statusMsg.innerText = '❌ Not logged in.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        return;
+      }
+
+      // Get user details and address
+      let name = '';
+      let address = null;
+      try {
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          name = data.name || '';
+          address = data.address || null;
+        }
+      } catch {}
+
+      if (!address || !address.street || !address.city || !address.state || !address.pincode || !address.country) {
+        statusMsg.innerText = '❌ Please add your address before placing an order.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        setTimeout(() => {
+          closePaymentMethodModal();
+          showPage('profile');
+        }, 2000);
+        return;
+      }
+
+      // Prepare order items
+      const orderItems = {};
+      for (let id in cart) {
+        if (cart[id].quantity > 0) {
+          orderItems[id] = cart[id];
+        }
+      }
+
+      if (Object.keys(orderItems).length === 0) {
+        statusMsg.innerText = '❌ Your cart is empty.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        return;
+      }
+
+      try {
+        statusMsg.innerText = '⏳ Placing COD order...';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#2d2d2d';
+        statusMsg.style.color = '#f57c00';
+
+        // Get full customer profile for COD payment
+        let customerProfile = { name, address, email: user.email };
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const profileData = customerDoc.data();
+            customerProfile = {
+              name: profileData.name || name,
+              email: user.email,
+              birthdate: profileData.birthdate || '',
+              gender: profileData.gender || '',
+              address: profileData.address || address
+            };
+          }
+        } catch (e) {
+          console.log('Error fetching customer profile for COD:', e);
+        }
+
+        const orderData = {
+          customer: customerProfile,
+          customer_uid: user.uid,
+          customer_email: user.email,
+          customer_name: customerProfile.name,
+          customer_birthdate: customerProfile.birthdate,
+          customer_gender: customerProfile.gender,
+          customer_address: customerProfile.address,
+          cart: orderItems,
+          createdAt: Date.now(),
+          created_at: new Date().toISOString(),
+          status: 'pending',
+          payment_method: 'cod'
+        };
+        
+        console.log('[Customer] Creating COD order with data:', orderData);
+        const orderRef = await addDoc(collection(db, "orders"), orderData);
+        console.log('[Customer] COD order created with ID:', orderRef.id);
+
+        statusMsg.innerText = '✅ COD order placed successfully!';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#2e7d32';
+
+        // Award store credits based on order amount
+        let totalAmount = 0;
+        for (let id in cart) {
+          if (cart[id].quantity > 0) {
+            totalAmount += cart[id].quantity * cart[id].price;
+          }
+        }
+        
+        let tokensEarned = 0;
+        if (totalAmount < 100) {
+          tokensEarned = 10;
+        } else if (totalAmount < 300) {
+          tokensEarned = 25;
+        } else if (totalAmount < 500) {
+          tokensEarned = 50;
+        } else {
+          // For orders >= 500, award 100 tokens
+          tokensEarned = 100;
+        }
+        
+        if (tokensEarned > 0) {
+          // Update customer store credits in Firestore
+          try {
+            const customerRef = doc(db, "customers", user.uid);
+            const customerDoc = await getDoc(customerRef);
+            if (customerDoc.exists()) {
+              const currentTokens = customerDoc.data().tokens || 0;
+              await updateDoc(customerRef, {
+                tokens: currentTokens + tokensEarned,
+                lastTokenUpdate: Date.now()
+              });
+              console.log(`[Customer] COD order - Awarded ${tokensEarned} store credits. Total: ${currentTokens + tokensEarned}`);
+            }
+          } catch (e) {
+            console.error('[Customer] Error updating tokens for COD:', e);
+          }
+          
+          // Show store credit notification and refresh display
+          setTimeout(() => {
+            alert(`🎉 You earned ${tokensEarned} store credits! (${tokensEarned * 0.5}₹ value)`);
+            refreshTokenDisplay(); // Refresh store credit display
+            if (currentPage === 'tokens') {
+              loadTokensPage(); // Refresh store credits page if currently viewing it
+            }
+          }, 500);
+        }
+        
+        // Clear cart and close modal
+        setTimeout(() => {
+          for (let id in cart) cart[id].quantity = 0;
+          updateCart();
+          filterProducts();
+          closePaymentMethodModal();
+          showOrderPlacedModal();
+          // Clear cart summary display
+          const cartSummaryContent = document.getElementById("cart-summary-content");
+          if (cartSummaryContent) {
+            cartSummaryContent.innerHTML = "<h3>Cart Summary</h3><p>Your cart is empty.</p>";
+          }
+        }, 2000);
+      } catch (e) {
+        statusMsg.innerText = '❌ Order failed: ' + (e.message || e);
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#c62828';
+      }
+    }
+
+    // Store Credit Payment Handler
+    async function handleTokenPayment() {
+      const user = auth.currentUser;
+      const statusMsg = document.getElementById('payment-status-msg');
+      
+      if (!user) {
+        statusMsg.innerText = '❌ Not logged in.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        return;
+      }
+
+      // Get user details, address, and token balance
+      let name = '';
+      let address = null;
+      let currentTokens = 0;
+      
+      try {
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          name = data.name || '';
+          address = data.address || null;
+          currentTokens = data.tokens || 0;
+        }
+      } catch {}
+
+      if (!address || !address.street || !address.city || !address.state || !address.pincode || !address.country) {
+        statusMsg.innerText = '❌ Please add your address before placing an order.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#ffebee';
+        statusMsg.style.color = '#c62828';
+        setTimeout(() => {
+          closePaymentMethodModal();
+          showPage('profile');
+        }, 2000);
+        return;
+      }
+
+      // Calculate cart total
+      let cartTotal = 0;
+      const orderItems = {};
+      for (let id in cart) {
+        if (cart[id].quantity > 0) {
+          orderItems[id] = cart[id];
+          cartTotal += cart[id].quantity * cart[id].price;
+        }
+      }
+
+      if (Object.keys(orderItems).length === 0) {
+        statusMsg.innerText = '❌ Your cart is empty.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#c62828';
+        return;
+      }
+
+      // Calculate store credits needed (1 store credit = ₹0.5)
+      const tokensNeeded = Math.ceil(cartTotal / 0.5);
+      
+      if (currentTokens < tokensNeeded) {
+        const shortfall = tokensNeeded - currentTokens;
+        const shortfallValue = shortfall * 0.5;
+        statusMsg.innerText = `❌ More token required`;
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#c62828';
+        return;
+      }
+
+      // Confirm token payment
+      const confirmMessage = `Confirm payment of ${tokensNeeded} tokens (₹${cartTotal.toFixed(2)})?\n\nCurrent balance: ${currentTokens} tokens\nAfter payment: ${currentTokens - tokensNeeded} tokens`;
+      
+      if (!confirm(confirmMessage)) {
+        statusMsg.innerText = '❌ Token payment cancelled.';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#c62828';
+        setTimeout(() => {
+          statusMsg.style.display = 'none';
+        }, 2000);
+        return;
+      }
+
+      try {
+        statusMsg.innerText = '⏳ Processing token payment...';
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#2d2d2d';
+        statusMsg.style.color = '#f57c00';
+
+        // Get full customer profile
+        let customerProfile = { name, address, email: user.email };
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const profileData = customerDoc.data();
+            customerProfile = {
+              name: profileData.name || name,
+              email: user.email,
+              birthdate: profileData.birthdate || '',
+              gender: profileData.gender || '',
+              address: profileData.address || address
+            };
+          }
+        } catch (e) {
+          console.log('Error fetching customer profile for token payment:', e);
+        }
+
+        // Create order with token payment
+        const orderData = {
+          customer: customerProfile,
+          customer_uid: user.uid,
+          customer_email: user.email,
+          customer_name: customerProfile.name,
+          customer_birthdate: customerProfile.birthdate,
+          customer_gender: customerProfile.gender,
+          customer_address: customerProfile.address,
+          cart: orderItems,
+          createdAt: Date.now(),
+          created_at: new Date().toISOString(),
+          status: 'confirmed',
+          payment_method: 'tokens',
+          tokens_used: tokensNeeded,
+          token_value: cartTotal
+        };
+        
+        console.log('[Customer] Creating token payment order with data:', orderData);
+        const orderRef = await addDoc(collection(db, "orders"), orderData);
+        console.log('[Customer] Token payment order created with ID:', orderRef.id);
+
+        // Deduct tokens from customer account
+        const newTokenBalance = currentTokens - tokensNeeded;
+        await updateDoc(doc(db, "customers", user.uid), {
+          tokens: newTokenBalance
+        });
+
+        statusMsg.innerText = `✅ Token payment successful! Used ${tokensNeeded} tokens (₹${cartTotal.toFixed(2)})`;
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#2e7d32';
+
+        // Clear cart and close modal
+        setTimeout(() => {
+          for (let id in cart) cart[id].quantity = 0;
+          updateCart();
+          filterProducts();
+          closePaymentMethodModal();
+          showOrderPlacedModal();
+          
+          // Refresh token displays
+          refreshTokenDisplay();
+          if (currentPage === 'tokens') {
+            loadTokensPage();
+          }
+          
+          // Clear cart summary display
+          const cartSummaryContent = document.getElementById("cart-summary-content");
+          if (cartSummaryContent) {
+            cartSummaryContent.innerHTML = "<h3>Cart Summary</h3><p>Your cart is empty.</p>";
+          }
+        }, 2000);
+        
+      } catch (e) {
+        statusMsg.innerText = '❌ Token payment failed: ' + (e.message || e);
+        statusMsg.style.display = 'block';
+        statusMsg.style.background = '#1a1a1a';
+        statusMsg.style.color = '#c62828';
+      }
+    }
+
+    // Debug function to manually check orders
+    window.debugOrders = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        console.log('No user logged in');
+        return;
+      }
+      
+      console.log('=== DEBUGGING ORDERS ===');
+      console.log('User email:', user.email);
+      console.log('User UID:', user.uid);
+      
+      try {
+        // Check all orders in the database
+        const allOrdersQuery = query(collection(db, "orders"));
+        const allOrdersSnapshot = await getDocs(allOrdersQuery);
+        
+        console.log('Total orders in database:', allOrdersSnapshot.size);
+        
+        allOrdersSnapshot.forEach(doc => {
+          const order = doc.data();
+          console.log('Order ID:', doc.id);
+          console.log('Order data:', order);
+          console.log('customer_email:', order.customer_email);
+          console.log('customer.email:', order.customer?.email);
+          console.log('customer_uid:', order.customer_uid);
+          console.log('---');
+        });
+        
+        // Check specific user orders
+        const userOrdersQuery = query(collection(db, "orders"), where("customer_email", "==", user.email));
+        const userOrdersSnapshot = await getDocs(userOrdersQuery);
+        console.log('Orders found for user email:', userOrdersSnapshot.size);
+        
+      } catch (e) {
+        console.error('Debug error:', e);
+      }
+    };
+
+    // Function to refresh token display across all pages
+    window.refreshTokenDisplay = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const customerDoc = await getDoc(doc(db, "customers", user.uid));
+          if (customerDoc.exists()) {
+            const data = customerDoc.data();
+            const currentTokens = data.tokens || 0;
+            
+            // Update all token count displays
+            const tokenCountElements = document.querySelectorAll('[id*="token-count"]');
+            tokenCountElements.forEach(element => {
+              if (element) {
+                element.textContent = currentTokens;
+              }
+            });
+            
+            // Update all token value displays
+            const tokenValueElements = document.querySelectorAll('[id*="token-value"]');
+            tokenValueElements.forEach(element => {
+              if (element) {
+                element.textContent = (currentTokens * 0.5).toFixed(2);
+              }
+            });
+            
+            console.log('[Customer] Token display refreshed:', currentTokens);
+          }
+        } catch (e) {
+          console.error('[Customer] Error refreshing token display:', e);
+        }
+      }
+    };
+
+    // Function to load tokens page
+    window.loadTokensPage = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        document.getElementById('tokens-page-count').textContent = '0';
+        document.getElementById('tokens-page-value').textContent = '0.00';
+        return;
+      }
+
+      try {
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
+          const currentTokens = data.tokens || 0;
+          document.getElementById('tokens-page-count').textContent = currentTokens;
+          document.getElementById('tokens-page-value').textContent = (currentTokens * 0.5).toFixed(2);
+        } else {
+          document.getElementById('tokens-page-count').textContent = '0';
+          document.getElementById('tokens-page-value').textContent = '0.00';
+        }
+        
+        // Load token history
+        await loadTokenHistory();
+        
+      } catch (e) {
+        console.error('[Customer] Error loading tokens page:', e);
+        document.getElementById('tokens-page-count').textContent = '0';
+        document.getElementById('tokens-page-value').textContent = '0.00';
+      }
+    };
+    
+    // Function to load token history
+    async function loadTokenHistory() {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      try {
+        const ordersQuery = query(collection(db, "orders"), where("customer_email", "==", user.email));
+        const ordersSnapshot = await getDocs(ordersQuery);
+        
+        const historyList = document.getElementById('token-history-list');
+        if (!historyList) return;
+        
+        if (ordersSnapshot.empty) {
+          historyList.innerHTML = '<div class="no-history">No orders found. Place your first order to start earning store credits!</div>';
+          return;
+        }
+        
+        let historyHtml = '';
+        const ordersArray = [];
+        
+        ordersSnapshot.forEach(docSnap => {
+          const order = docSnap.data();
+          if (order.status !== 'cancelled') {
+            ordersArray.push({
+              id: docSnap.id,
+              data: order
+            });
+          }
+        });
+        
+        // Sort orders by creation time (newest first)
+        ordersArray.sort((a, b) => {
+          const timeA = a.data.createdAt || new Date(a.data.created_at).getTime();
+          const timeB = b.data.createdAt || new Date(b.data.created_at).getTime();
+          return timeB - timeA;
+        });
+        
+        ordersArray.forEach(order => {
+          const orderData = order.data;
+          const orderDate = new Date(orderData.createdAt || orderData.created_at);
+          const formattedDate = orderDate.toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          
+          // Calculate tokens for this order
+          let orderTotal = 0;
+          for (let id in orderData.cart) {
+            if (orderData.cart[id].quantity > 0) {
+              orderTotal += orderData.cart[id].quantity * orderData.cart[id].price;
+            }
+          }
+          
+          let orderTokens = 0;
+          if (orderTotal < 100) {
+            orderTokens = 10;
+          } else if (orderTotal < 300) {
+            orderTokens = 25;
+          } else if (orderTotal < 500) {
+            orderTokens = 50;
+          } else {
+            orderTokens = 100;
+          }
+          
+          const statusLabel = orderData.status === 'delivered' ? '✅ Delivered' : 
+                             orderData.status === 'cancelled' ? '❌ Cancelled' : '🔄 Active';
+          
+          historyHtml += `
+            <div class="rule-item" style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                  <div style="font-weight: 600; color: #f5f5f5;">Order #${order.id.slice(-8)}</div>
+                  <div style="font-size: 0.9em; color: #ccc;">${formattedDate} - ${statusLabel}</div>
+                  <div style="font-size: 0.9em; color: #beb08b;">₹${orderTotal.toFixed(2)}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="color: #667eea; font-weight: bold; font-size: 1.1em;">+${orderTokens} tokens</div>
+                  <div style="color: #28a745; font-size: 0.9em;">₹${(orderTokens * 0.5).toFixed(2)} value</div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        historyList.innerHTML = historyHtml;
+        
+      } catch (e) {
+        console.error('[Customer] Error loading token history:', e);
+        const historyList = document.getElementById('token-history-list');
+        if (historyList) {
+          historyList.innerHTML = '<div class="no-history">Error loading token history.</div>';
+        }
+      }
+    }
+
+    // Function to load token summary for profile page
+    async function loadTokenSummary() {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      try {
+        const ordersQuery = query(collection(db, "orders"), where("customer_email", "==", user.email));
+        const ordersSnapshot = await getDocs(ordersQuery);
+        
+        let totalOrders = 0;
+        let deliveredOrders = 0;
+        let totalSpent = 0;
+        let totalTokensEarned = 0;
+        
+        ordersSnapshot.forEach(docSnap => {
+          const order = docSnap.data();
+          if (order.status !== 'cancelled') {
+            totalOrders++;
+            
+            if (order.status === 'delivered') {
+              deliveredOrders++;
+            }
+            
+            // Calculate order total
+            let orderTotal = 0;
+            for (let id in order.cart) {
+              if (order.cart[id].quantity > 0) {
+                orderTotal += order.cart[id].quantity * order.cart[id].price;
+              }
+            }
+            totalSpent += orderTotal;
+            
+            // Calculate tokens for this order
+            let orderTokens = 0;
+            if (orderTotal < 100) {
+              orderTokens = 10;
+            } else if (orderTotal < 300) {
+              orderTokens = 25;
+            } else if (orderTotal < 500) {
+              orderTokens = 50;
+            } else {
+              orderTokens = 100;
+            }
+            
+            totalTokensEarned += orderTokens;
+          }
+        });
+        
+        // Update profile token display with summary
+        const currentTokens = document.getElementById("profile-token-count").textContent;
+        const tokenValue = document.getElementById("profile-token-value").textContent;
+        
+        // Add summary information below the token display
+        const tokenDisplaySection = document.querySelector('.token-display-section');
+        if (tokenDisplaySection) {
+          const existingSummary = tokenDisplaySection.querySelector('.token-summary');
+          if (existingSummary) {
+            existingSummary.remove();
+          }
+          
+          const summaryDiv = document.createElement('div');
+          summaryDiv.className = 'token-summary';
+          summaryDiv.style.cssText = 'margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.9em;';
+          summaryDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Total Orders:</span>
+              <span style="color: #26F7FD;">${totalOrders}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Delivered:</span>
+              <span style="color: #28a745;">${deliveredOrders}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Total Spent:</span>
+              <span style="color: #ffc107;">₹${totalSpent.toFixed(2)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span>Tokens Earned:</span>
+              <span style="color: #667eea;">${totalTokensEarned}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px;">
+              <span>Current Balance:</span>
+              <span style="color: #f5f5f5; font-weight: 600;">${currentTokens} tokens (₹${tokenValue})</span>
+            </div>
+          `;
+          
+          tokenDisplaySection.appendChild(summaryDiv);
+        }
+        
+      } catch (e) {
+        console.error('[Customer] Error loading token summary:', e);
+      }
+    }
+
+    // Function to validate and recalculate store credits based on order history
+    window.validateTokenCalculations = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Please log in to validate tokens.');
+        return;
+      }
+      
+      try {
+        // Get customer's current token balance
+        const customerDoc = await getDoc(doc(db, "customers", user.uid));
+        if (!customerDoc.exists()) {
+          alert('Customer profile not found.');
+          return;
+        }
+        
+        const currentTokens = customerDoc.data().tokens || 0;
+        
+        // Get all orders for this customer
+        const ordersQuery = query(collection(db, "orders"), where("customer_email", "==", user.email));
+        const ordersSnapshot = await getDocs(ordersQuery);
+        
+        let calculatedTokens = 0;
+        let totalOrders = 0;
+        
+        ordersSnapshot.forEach(docSnap => {
+          const order = docSnap.data();
+          if (order.status !== 'cancelled') {
+            totalOrders++;
+            
+            // Calculate tokens for this order
+            let orderTotal = 0;
+            for (let id in order.cart) {
+              if (order.cart[id].quantity > 0) {
+                orderTotal += order.cart[id].quantity * order.cart[id].price;
+              }
+            }
+            
+            let orderTokens = 0;
+            if (orderTotal < 100) {
+              orderTokens = 10;
+            } else if (orderTotal < 300) {
+              orderTokens = 25;
+            } else if (orderTotal < 500) {
+              orderTokens = 50;
+            } else {
+              orderTokens = 100;
+            }
+            
+            calculatedTokens += orderTokens;
+          }
+        });
+        
+        // Check if there's a discrepancy
+        if (calculatedTokens !== currentTokens) {
+          const confirmUpdate = confirm(
+            `Token calculation discrepancy detected!\n\n` +
+            `Current balance: ${currentTokens} tokens\n` +
+            `Calculated from orders: ${calculatedTokens} tokens\n\n` +
+            `Would you like to update your token balance to ${calculatedTokens} tokens?`
+          );
+          
+          if (confirmUpdate) {
+            await updateDoc(doc(db, "customers", user.uid), {
+              tokens: calculatedTokens,
+              lastTokenUpdate: Date.now(),
+              tokenValidationDate: Date.now()
+            });
+            
+            alert(`✅ Token balance updated to ${calculatedTokens} tokens!`);
+            refreshTokenDisplay();
+            if (currentPage === 'tokens') {
+              loadTokensPage();
+            }
+          }
+        } else {
+          alert(`✅ Token calculation validated! Your current balance of ${currentTokens} tokens is correct based on ${totalOrders} orders.`);
+        }
+        
+      } catch (e) {
+        console.error('[Customer] Error validating token calculations:', e);
+        alert('❌ Error validating tokens: ' + e.message);
+      }
+    };
+
+    loadProducts();
+  </script>
+</body>
+</html>
